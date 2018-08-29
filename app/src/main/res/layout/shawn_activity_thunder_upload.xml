@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:orientation="vertical">
+
+    <include
+        android:id="@+id/reTitle"
+        layout="@layout/shawn_layout_title"/>
+
+    <EditText
+        android:id="@+id/etContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/reTitle"
+        android:background="@color/white"
+        android:gravity="left|top"
+        android:hint="记录雷电时刻，留下想说的话，最多可输入100个字..."
+        android:lineSpacingExtra="3dp"
+        android:minLines="5"
+        android:padding="10dp"
+        android:textColor="@color/text_color3"
+        android:textColorHint="@color/text_color2"
+        android:textSize="@dimen/level_4"/>
+
+    <TextView
+        android:id="@+id/tvTextCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/etContent"
+        android:layout_marginEnd="10dp"
+        android:text="(0/100)"
+        android:textColor="@color/text_color2"
+        android:textSize="@dimen/level_5"/>
+
+    <LinearLayout
+        android:id="@+id/llAdd"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/tvTextCount"
+        android:layout_marginStart="10dp"
+        android:background="@color/light_gray"
+        android:gravity="center_horizontal|center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/shawn_icon_add"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="添加图片"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_5"/>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/tvTextCount"
+        android:layout_marginStart="10dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/divider1"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/llAdd"
+        android:layout_marginTop="10dp"
+        android:background="@color/light_gray"/>
+
+    <LinearLayout
+        android:id="@+id/llImgType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider1"
+        android:background="@drawable/shawn_selector_item"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="图片类型"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvImgType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="雷电事件"
+            android:textColor="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/llImgType"
+        android:background="@color/light_gray"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"/>
+
+    <LinearLayout
+        android:id="@+id/llEventType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider2"
+        android:background="@drawable/shawn_selector_item"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="事件行业"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvEventType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="人员"
+            android:textColor="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+        <ImageView
+            android:layout_width="8dp"
+            android:layout_height="15dp"
+            android:background="@drawable/shawn_icon_arrow_right"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/divider3"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/llEventType"
+        android:background="@color/light_gray"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"/>
+
+    <LinearLayout
+        android:id="@+id/llPosition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider3"
+        android:background="@drawable/shawn_selector_item"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="事故地点"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/divider4"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/llPosition"
+        android:background="@color/light_gray"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"/>
+
+    <LinearLayout
+        android:id="@+id/llTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/divider4"
+        android:background="@drawable/shawn_selector_item"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="事故时间"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:textColor="@color/text_color2"
+            android:textSize="@dimen/level_4"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/divider5"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@+id/llTime"
+        android:background="@color/light_gray"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"/>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/loadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:indicator="LineScalePulseOutRapid"
+        app:indicator_color="@color/colorPrimary"/>
+
+</RelativeLayout>

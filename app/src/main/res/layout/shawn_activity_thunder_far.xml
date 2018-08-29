@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shawn_bg_thunder_far"
+                android:orientation="vertical">
+
+    <include
+        android:id="@+id/reTitle"
+        layout="@layout/shawn_layout_title"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:id="@+id/tvFar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="40dp"
+            android:text="雷电有多远"
+            android:textColor="@color/white"
+            android:textSize="40sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tvLook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvFar"
+            android:layout_centerHorizontal="true"
+            android:text="看到闪电点击"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tvLine1"
+            android:layout_width="50dp"
+            android:layout_height="20dp"
+            android:layout_below="@+id/tvLook"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="-10dp"
+            android:layout_marginStart="-10dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/shawn_bg_vertical_dashline"
+            android:layerType="software"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvSound"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvLine1"
+            android:layout_centerHorizontal="true"
+            android:text="听到声音点击"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvLine2"
+            android:layout_width="50dp"
+            android:layout_height="20dp"
+            android:layout_below="@+id/tvSound"
+            android:layout_centerHorizontal="true"
+            android:layout_marginEnd="-10dp"
+            android:layout_marginStart="-10dp"
+            android:layout_marginTop="2dp"
+            android:background="@drawable/shawn_bg_vertical_dashline"
+            android:layerType="software"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/ivThunderClick"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_below="@+id/tvLine2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/shawn_icon_thunder_click"/>
+
+        <RelativeLayout
+            android:visibility="invisible"
+            android:id="@+id/reResult"
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/tvLine2">
+
+        <TextView
+            android:id="@+id/tv1"
+            android:layout_width="8dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:background="#850082"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toStartOf="@+id/tv1"
+            android:text="1"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:id="@+id/tvThunderLevel1"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/tv1"
+            android:gravity="center"
+            android:text="极度危险"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tv2"
+            android:layout_width="8dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv1"
+            android:layout_centerHorizontal="true"
+            android:background="#AC0063"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv1"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toStartOf="@+id/tv2"
+            android:text="3"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:id="@+id/tvThunderLevel2"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv1"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/tv2"
+            android:gravity="center"
+            android:text="高危险"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tv3"
+            android:layout_width="8dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv2"
+            android:layout_centerHorizontal="true"
+            android:background="#C32B03"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv2"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toStartOf="@+id/tv3"
+            android:text="6"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:id="@+id/tvThunderLevel3"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv2"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/tv3"
+            android:gravity="center"
+            android:text="危险"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tv4"
+            android:layout_width="8dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv3"
+            android:layout_centerHorizontal="true"
+            android:background="#E67005"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv3"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toStartOf="@+id/tv3"
+            android:text="12"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:id="@+id/tvThunderLevel4"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv3"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/tv4"
+            android:gravity="center"
+            android:text="较危险"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"/>
+
+        <TextView
+            android:id="@+id/tv5"
+            android:layout_width="8dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv4"
+            android:layout_centerHorizontal="true"
+            android:background="#F79435"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv4"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toStartOf="@+id/tv4"
+            android:text="20"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv5"
+            android:layout_marginEnd="5dp"
+            android:layout_marginTop="-5dp"
+            android:layout_toStartOf="@+id/tv5"
+            android:text="30"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <TextView
+            android:id="@+id/tvThunderLevel5"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/tv4"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/tv5"
+            android:gravity="center"
+            android:text="有一定危险性"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_4"/>
+
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:src="@drawable/shawn_icon_warning"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="3dp"
+            android:text="在确保安全的情况下使用"
+            android:textColor="@color/yellow"
+            android:textSize="@dimen/level_4"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <include
+        android:id="@+id/reTitle"
+        layout="@layout/shawn_layout_title" />
+
+    <com.cxwl.shawn.thunder.swipemenulistview.SwipeMenuListView
+        android:layout_below="@+id/reTitle"
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:cacheColorHint="@color/transparent"
+        android:divider="@color/light_gray"
+        android:dividerHeight="0.5dp"
+        android:listSelector="@color/transparent"
+        android:scrollbarSize="2dp"
+        android:scrollbarThumbVertical="@color/colorPrimary"
+        android:padding="1dp"/>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/loadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        app:indicator="LineScalePulseOutRapid"
+        app:indicator_color="@color/colorPrimary"/>
+
+</RelativeLayout>

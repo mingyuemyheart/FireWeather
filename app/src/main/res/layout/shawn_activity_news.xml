@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/light_gray"
+                android:orientation="vertical">
+
+    <include 
+        android:id="@+id/reTitle"
+        layout="@layout/shawn_layout_title"/>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/reTitle">
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:cacheColorHint="@color/transparent"
+            android:divider="@color/transparent"
+            android:dividerHeight="5dp"
+            android:listSelector="@color/transparent"
+            android:overScrollMode="never"
+            android:scrollbarSize="2dp"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbarThumbVertical="@color/black"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <com.wang.avi.AVLoadingIndicatorView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/loadingView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="visible"
+        app:indicator="LineScalePulseOutRapid"
+        app:indicator_color="@color/colorPrimary"/>
+
+</RelativeLayout>
