@@ -56,6 +56,7 @@ import com.cxwl.shawn.thunder.manager.CloudManager;
 import com.cxwl.shawn.thunder.manager.LeibaoManager;
 import com.cxwl.shawn.thunder.manager.RadarManager;
 import com.cxwl.shawn.thunder.manager.RainManager;
+import com.cxwl.shawn.thunder.manager.YdgdManager;
 import com.cxwl.shawn.thunder.util.CommonUtil;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.util.SecretUrlUtil;
@@ -105,6 +106,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd", Locale.CHINA);
     private SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
     private SimpleDateFormat sdf3 = new SimpleDateFormat("yyyyMMddHHmm", Locale.CHINA);
+    private SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.CHINA);
     private AVLoadingIndicatorView loadingView;
     private int width = 0;
 
@@ -152,6 +154,12 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private Map<String, StrongStreamDto> leibaoDataMap = new LinkedHashMap<>();//雷暴图数据集合,时间、图对应地址,linked按照顺序输出
     private GroundOverlay leibaoOverlay;
     private LeibaoManager leibaoManager;
+
+    //云顶高度
+    private boolean isShowYunding = false;//是否显示云顶高度图
+    private Map<String, StrongStreamDto> yundingDataMap = new LinkedHashMap<>();//云顶高度图数据集合,时间、图对应地址,linked按照顺序输出
+    private GroundOverlay yundingOverlay;
+    private YdgdManager yundingManager;
 
     //设置
     private LinearLayout llSetting;
@@ -253,6 +261,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         cloudManager = new CloudManager(getActivity());
         rainManager = new RainManager(getActivity());
         leibaoManager = new LeibaoManager(getActivity());
+        yundingManager = new YdgdManager(getActivity());
 
     }
 
@@ -413,12 +422,12 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                         //实况信息
                                         if (!obj.isNull("l")) {
                                             JSONObject l = obj.getJSONObject("l");
-                                            if (!l.isNull("l7")) {
-                                                String time = l.getString("l7");
-                                                if (time != null) {
-                                                    tvTime.setText(sdf1.format(new Date())+" "+time+"发布");
-                                                }
-                                            }
+//                                            if (!l.isNull("l7")) {
+//                                                String time = l.getString("l7");
+//                                                if (time != null) {
+//                                                    tvTime.setText(sdf1.format(new Date())+" "+time+"发布");
+//                                                }
+//                                            }
                                             if (!l.isNull("l1")) {
                                                 String factTemp = WeatherUtil.lastValue(l.getString("l1"));
                                                 tvTemp.setText("温度"+factTemp+"℃ | ");
@@ -571,7 +580,19 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                         for (int i = 0; i < array.length(); i++) {
                                             JSONObject itemObj = array.getJSONObject(i);
                                             if (!itemObj.isNull("startTime")) {
-                                                String startTime = itemObj.getString("startTime");
+                                                final String startTime = itemObj.getString("startTime");
+                                                if (i == array.length()-1) {
+                                                    getActivity().runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try {
+                                                                tvTime.setText(sdf4.format(sdf3.parse(startTime))+"发布");
+                                                            } catch (ParseException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
+                                                }
 
                                                 if (!itemObj.isNull("data")) {
                                                     JSONArray dataArray = itemObj.getJSONArray("data");
@@ -790,6 +811,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                 StrongStreamDto dto = new StrongStreamDto();
                                                 dto.imgUrl = "http://radar-qpfref.tianqi.cn/"+itemUrl;
                                                 dto.startTime = itemUrl.substring(itemUrl.length()-16, itemUrl.length()-4);
+                                                if (i == array.length()-1) {
+                                                    dto.tag = dto.startTime;
+                                                    STARTTIME = dto.startTime;
+                                                    drawMutiElement(dto.startTime);
+                                                }
                                                 radarDataMap.put(dto.startTime, dto);
                                             }
                                         }
@@ -802,11 +828,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                             StrongStreamDto dto = new StrongStreamDto();
                                             dto.imgUrl = "http://radar-qpfref.tianqi.cn/"+itemUrl;
                                             dto.startTime = itemUrl.substring(itemUrl.length()-16, itemUrl.length()-4);
-                                            if (i == 0) {
-                                                dto.tag = dto.startTime;
-                                                STARTTIME = dto.startTime;
-                                                drawMutiElement(dto.startTime);
-                                            }
                                             radarDataMap.put(dto.startTime, dto);
                                         }
                                     }
@@ -1021,6 +1042,21 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     }
                 }else {
                     removeLeibaoOverlay();
+                }
+            }
+        }
+
+        //绘制对应时间的云顶高度图
+        if (isShowYunding) {
+            if (yundingDataMap.containsKey(startTime)) {
+                StrongStreamDto dto = yundingDataMap.get(startTime);
+                if (!TextUtils.isEmpty(dto.imgPath)) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                    if (bitmap != null) {
+                        drawYundingImg(bitmap, dto);
+                    }
+                }else {
+                    removeYundingOverlay();
                 }
             }
         }
@@ -1317,7 +1353,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                             try {
                                 cloudDataMap.clear();
                                 JSONObject obj = new JSONObject(result);
-                                LatLng leftLatLng = null, rightLatLng = null;
+                                LatLng leftLatLng = null,rightLatLng = null;
                                 if (!obj.isNull("rect")) {
                                     JSONArray rect = obj.getJSONArray("rect");
                                     leftLatLng = new LatLng(rect.getDouble(2), rect.getDouble(1));
@@ -1522,7 +1558,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                             try {
                                 rainDataMap.clear();
                                 JSONObject obj = new JSONObject(result);
-                                LatLng leftLatLng = null, rightLatLng = null;
+                                LatLng leftLatLng = null,rightLatLng = null;
                                 if (!obj.isNull("rect")) {
                                     JSONArray rect = obj.getJSONArray("rect");
                                     leftLatLng = new LatLng(rect.getDouble(2), rect.getDouble(1));
@@ -1679,7 +1715,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                             try {
                                 leibaoDataMap.clear();
                                 JSONObject obj = new JSONObject(result);
-                                LatLng leftLatLng = null, rightLatLng = null;
+                                LatLng leftLatLng = null,rightLatLng = null;
                                 if (!obj.isNull("rect")) {
                                     JSONArray rect = obj.getJSONArray("rect");
                                     leftLatLng = new LatLng(rect.getDouble(2), rect.getDouble(1));
@@ -1808,6 +1844,161 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         if (leibaoOverlay != null) {
             leibaoOverlay.remove();
             leibaoOverlay = null;
+        }
+    }
+
+    /**
+     * 获取云顶高度图数据
+     */
+    private void OkHttpYunding() {
+        loadingView.setVisibility(View.VISIBLE);
+        final String url = "https://decision-admin.tianqi.cn/home/other/light_geth8cloud_height_imgs";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                    }
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (!response.isSuccessful()) {
+                            return;
+                        }
+                        String result = response.body().string();
+                        if (!TextUtils.isEmpty(result)) {
+                            try {
+                                yundingDataMap.clear();
+                                JSONObject obj = new JSONObject(result);
+                                LatLng leftLatLng = null,rightLatLng = null;
+                                if (!obj.isNull("rect")) {
+                                    JSONArray rect = obj.getJSONArray("rect");
+                                    leftLatLng = new LatLng(rect.getDouble(2), rect.getDouble(1));
+                                    rightLatLng = new LatLng(rect.getDouble(0), rect.getDouble(3));
+                                }
+                                if (!obj.isNull("l")) {
+                                    JSONArray array = obj.getJSONArray("l");
+                                    for (int i = 0; i < array.length(); i++) {
+                                        JSONObject itemObj = array.getJSONObject(i);
+                                        StrongStreamDto dto = new StrongStreamDto();
+                                        dto.leftLatLng = leftLatLng;
+                                        dto.rightLatLng = rightLatLng;
+                                        if (!itemObj.isNull("l1")) {
+                                            try {
+                                                dto.startTime = sdf3.format(sdf2.parse(itemObj.getString("l1")));
+                                                if (!itemObj.isNull("l2")) {
+                                                    dto.imgUrl = itemObj.getString("l2");
+                                                    yundingDataMap.put(dto.startTime, dto);
+                                                    if (TextUtils.equals(dto.startTime, STARTTIME)) {
+                                                        drawCurrentYundingImg();
+                                                    }
+                                                }
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+
+                                    if (yundingDataMap.size() > 0) {
+                                        startDownloadYundingImgs();
+                                    }
+
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            loadingView.setVisibility(View.GONE);
+                                        }
+                                    });
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
+    /**
+     * 下载所有云顶高度图
+     */
+    private void startDownloadYundingImgs() {
+        yundingManager.loadImagesAsyn(yundingDataMap, new YdgdManager.YdgdListener() {
+            @Override
+            public void onResult(int result, final Map<String, StrongStreamDto> map) {
+                //绘制当前时刻对应的云图
+                if (result == YdgdManager.YdgdListener.RESULT_SUCCESSED) {
+                    drawCurrentYundingImg();
+                }
+            }
+
+            @Override
+            public void onProgress(String url, int progress) {
+            }
+        });
+    }
+
+    /**
+     * 绘制当前时刻对应的云顶高度图
+     */
+    private void drawCurrentYundingImg() {
+        if (!isShowYunding) {
+            return;
+        }
+        if (!TextUtils.isEmpty(STARTTIME) && yundingDataMap.containsKey(STARTTIME)) {
+            StrongStreamDto dto = yundingDataMap.get(STARTTIME);
+            if (TextUtils.equals(dto.tag, STARTTIME)) {
+                if (!TextUtils.isEmpty(dto.imgPath)) {
+                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                    if (bitmap != null) {
+                        drawYundingImg(bitmap, dto);
+                    }
+                }else {
+                    removeYundingOverlay();
+                }
+            }
+        }
+    }
+
+    /**
+     * 绘制云顶高度图
+     * @param bitmap
+     */
+    private void drawYundingImg(Bitmap bitmap, StrongStreamDto dto) {
+        if (bitmap == null || !isShowYunding) {
+            removeYundingOverlay();
+            return;
+        }
+        BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(dto.leftLatLng)
+                .include(dto.rightLatLng)
+                .build();
+
+        if (yundingOverlay == null) {
+            yundingOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
+                    .anchor(0.5f, 0.5f)
+                    .positionFromBounds(bounds)
+                    .image(fromView)
+                    .zIndex(1000)
+                    .transparency(0.0f));
+        } else {
+            yundingOverlay.setImage(null);
+            yundingOverlay.setPositionFromBounds(bounds);
+            yundingOverlay.setImage(fromView);
+        }
+        aMap.runOnDrawFrame();
+    }
+
+    /**
+     * 去除云顶高度图
+     */
+    private void removeYundingOverlay() {
+        if (yundingOverlay != null) {
+            yundingOverlay.remove();
+            yundingOverlay = null;
         }
     }
 
@@ -2194,10 +2385,21 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                 Toast.makeText(getActivity(), "暂无数据，敬请期待！！！", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.ivMoreYdgd:
-                Toast.makeText(getActivity(), "暂无数据，敬请期待！！！", Toast.LENGTH_SHORT).show();
+                isShowYunding = !isShowYunding;
+                if (isShowYunding) {
+                    ivMoreYdgd.setImageResource(R.drawable.shawn_icon_more_ydgdon);
+                    if (yundingDataMap.size() <= 0) {
+                        OkHttpYunding();
+                    }else {
+                        drawCurrentYundingImg();
+                    }
+                }else {
+                    ivMoreYdgd.setImageResource(R.drawable.shawn_icon_more_ydgd);
+                    removeYundingOverlay();
+                }
                 break;
 
-                //shezhi
+                //设置
             case R.id.ivSetting:
                 isShowSetting = !isShowSetting;
                 if (isShowSetting) {
@@ -2338,6 +2540,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         cancelRadarThread();
         removeRadarOverlay();
         removeCloudOverlay();
+        removeYundingOverlay();
     }
 
 }
