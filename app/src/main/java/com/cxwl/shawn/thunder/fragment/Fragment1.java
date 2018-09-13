@@ -1,5 +1,7 @@
 package com.cxwl.shawn.thunder.fragment;
 
+import android.animation.IntEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -49,6 +51,7 @@ import com.cxwl.shawn.thunder.R;
 import com.cxwl.shawn.thunder.ThunderFarActivity;
 import com.cxwl.shawn.thunder.ThunderUploadActivity;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
+import com.cxwl.shawn.thunder.dto.WeatherDto;
 import com.cxwl.shawn.thunder.manager.CloudManager;
 import com.cxwl.shawn.thunder.manager.LeibaoManager;
 import com.cxwl.shawn.thunder.manager.RadarManager;
@@ -58,6 +61,7 @@ import com.cxwl.shawn.thunder.util.CommonUtil;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.util.SecretUrlUtil;
 import com.cxwl.shawn.thunder.util.WeatherUtil;
+import com.cxwl.shawn.thunder.view.MinuteFallView;
 import com.cxwl.shawn.thunder.view.SeekbarTime;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -96,9 +100,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private AMapLocationClient mLocationClient;//声明AMapLocationClient类对象
     private Marker locationMarker;
     private LatLng locationLatLng;
-    private ImageView ivRadar,ivCloud,ivMore,ivPlay;
-    private LinearLayout llTimeContainer,llRadar,llCloud,llMore;
-    private TextView tvPosition,tvStreet,tvTime,tvTemp,tvHumidity,tvWind,tvVisible,tvThunder,tvRadar,tvCloud,tvMore,tvSeekbarTime;
+    private RelativeLayout reTop,reChart;
+    private boolean isShowDetail = true;//是否显示上方详情
+    private ImageView ivArrow,ivRadar,ivCloud,ivMore,ivPlay;
+    private LinearLayout llContainer,llTimeContainer,llRadar,llCloud,llMore;
+    private TextView tvPosition,tvStreet,tvTime,tvTemp,tvHumidity,tvWind,tvVisible,tvRain,tvThunder,tvRadar,tvCloud,tvMore,tvSeekbarTime;
     private SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm", Locale.CHINA);
     private SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
     private SimpleDateFormat sdf3 = new SimpleDateFormat("yyyyMMddHHmm", Locale.CHINA);
@@ -193,6 +199,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         ivPicture.setOnClickListener(this);
         ImageView ivThunderFar = view.findViewById(R.id.ivThunderFar);
         ivThunderFar.setOnClickListener(this);
+        reTop = view.findViewById(R.id.reTop);
+        reTop.setOnClickListener(this);
+        reChart = view.findViewById(R.id.reChart);
+        ivArrow = view.findViewById(R.id.ivArrow);
+        ivArrow.setOnClickListener(this);
         ivRadar = view.findViewById(R.id.ivRadar);
         ivCloud = view.findViewById(R.id.ivCloud);
         ivMore = view.findViewById(R.id.ivMore);
@@ -212,7 +223,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         tvHumidity = view.findViewById(R.id.tvHumidity);
         tvWind = view.findViewById(R.id.tvWind);
         tvVisible = view.findViewById(R.id.tvVisible);
+        tvRain = view.findViewById(R.id.tvRain);
         tvThunder = view.findViewById(R.id.tvThunder);
+        llContainer = view.findViewById(R.id.llContainer);
         llTimeContainer = view.findViewById(R.id.llTimeContainer);
         tvSeekbarTime = view.findViewById(R.id.tvSeekbarTime);
         ivPlay = view.findViewById(R.id.ivPlay);
@@ -337,6 +350,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         addLocationMarker();
         OkHttpThunder();
         OkHttpThunderForecast(locationLatLng.longitude, locationLatLng.latitude);
+        OkHttpMinute(locationLatLng.longitude, locationLatLng.latitude);
         OkHttpGeo(locationLatLng.longitude, locationLatLng.latitude);
     }
 
@@ -451,9 +465,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                             WeatherUtil.getFactWindForce(Integer.valueOf(windForce))+" | ");
                                                 }
                                             }
-                                            if (!l.isNull("l10")) {
-                                                String visible = WeatherUtil.lastValue(l.getString("l10"));
-                                                tvVisible.setText("能见度"+visible+"hPa");
+                                            if (!l.isNull("l9")) {
+                                                String visible = WeatherUtil.lastValue(l.getString("l9"));
+                                                if (!TextUtils.isEmpty(visible)) {
+                                                    tvVisible.setText("能见度"+Float.valueOf(visible)/1000.0f+"km");
+                                                }
                                             }
                                         }
 
@@ -469,6 +485,73 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     @Override
                     public void onError(Throwable error, String content) {
                         super.onError(error, content);
+                    }
+                });
+            }
+        }).start();
+    }
+
+    /**
+     * 获取分钟降水信息
+     * @param lng
+     * @param lat
+     */
+    private void OkHttpMinute(double lng, double lat) {
+        final String url = "http://api.caiyunapp.com/v2/HyTVV5YAkoxlQ3Zd/"+lng+","+lat+"/forecast";
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                    }
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (!response.isSuccessful()) {
+                            return;
+                        }
+                        final String result = response.body().string();
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (!TextUtils.isEmpty(result)) {
+                                    try {
+                                        JSONObject object = new JSONObject(result);
+                                        if (!object.isNull("result")) {
+                                            JSONObject obj = object.getJSONObject("result");
+                                            if (!obj.isNull("minutely")) {
+                                                JSONObject objMin = obj.getJSONObject("minutely");
+                                                if (!objMin.isNull("description")) {
+                                                    String rain = objMin.getString("description");
+                                                    if (!TextUtils.isEmpty(rain)) {
+                                                        tvRain.setText(rain.replace("小彩云", ""));
+                                                        tvRain.setVisibility(View.VISIBLE);
+                                                    }else {
+                                                        tvRain.setVisibility(View.GONE);
+                                                    }
+                                                }
+                                                if (!objMin.isNull("precipitation_2h")) {
+                                                    JSONArray array = objMin.getJSONArray("precipitation_2h");
+                                                    List<WeatherDto> minuteList = new ArrayList<>();
+                                                    for (int i = 0; i < array.length(); i++) {
+                                                        WeatherDto dto = new WeatherDto();
+                                                        dto.minuteFall = (float) array.getDouble(i);
+                                                        minuteList.add(dto);
+                                                    }
+
+                                                    MinuteFallView minuteFallView = new MinuteFallView(getActivity());
+                                                    minuteFallView.setData(minuteList, tvRain.getText().toString());
+                                                    llContainer.removeAllViews();
+                                                    llContainer.addView(minuteFallView, width, (int)(CommonUtil.dip2px(getActivity(), 120)));
+                                                }
+                                            }
+                                        }
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -2365,9 +2448,53 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         }
     }
 
+    /**
+     * 隐藏或显示ListView的动画
+     */
+    public void hideOrShowListViewAnimator(final View view, final int startValue,final int endValue){
+        //1.设置属性的初始值和结束值
+        ValueAnimator mAnimator = ValueAnimator.ofInt(0,100);
+        //2.为目标对象的属性变化设置监听器
+        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int animatorValue = (Integer) animation.getAnimatedValue();
+                float fraction = animatorValue/100f;
+                IntEvaluator mEvaluator = new IntEvaluator();
+                //3.使用IntEvaluator计算属性值并赋值给ListView的高
+                view.getLayoutParams().height = mEvaluator.evaluate(fraction, startValue, endValue);
+                view.requestLayout();
+            }
+        });
+        //4.为ValueAnimator设置LinearInterpolator
+        mAnimator.setInterpolator(new LinearInterpolator());
+        //5.设置动画的持续时间
+        mAnimator.setDuration(200);
+        //6.为ValueAnimator设置目标对象并开始执行动画
+        mAnimator.setTarget(view);
+        mAnimator.start();
+    }
+
+    private void clickRainChart() {
+        reChart.measure(0, 0);
+        int height = reChart.getMeasuredHeight();
+        isShowDetail = !isShowDetail;
+        if (isShowDetail) {
+            ivArrow.setImageResource(R.drawable.shawn_icon_animation_up);
+            hideOrShowListViewAnimator(reChart, 0, height);
+        }else {
+            ivArrow.setImageResource(R.drawable.shawn_icon_animation_down);
+            hideOrShowListViewAnimator(reChart, height, 0);
+        }
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.reTop:
+            case R.id.ivArrow:
+                clickRainChart();
+                break;
             case R.id.ivThunderFar:
                 startActivity(new Intent(getActivity(), ThunderFarActivity.class));
                 break;

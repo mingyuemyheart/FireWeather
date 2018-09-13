@@ -10,164 +10,218 @@
         android:layout_height="wrap_content"/>
 
     <RelativeLayout
-        android:clickable="true"
-        android:focusable="true"
         android:id="@+id/reTop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/shawn_bg_corner_white"
-        android:layout_margin="5dp"
-        android:padding="5dp">
-
-        <ImageView
-            android:id="@+id/ivLoc"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_marginTop="3dp"
-            android:src="@drawable/shawn_icon_location_black"/>
-
-        <TextView
-            android:id="@+id/tvPosition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/ivLoc"
-            android:textSize="@dimen/level_4"
-            android:textColor="@color/text_color3"/>
-
-        <TextView
-            android:id="@+id/tvStreet"
-            android:layout_below="@+id/tvPosition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/ivLoc"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color2"/>
-
-        <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color2"/>
-
-        <TextView
-            android:id="@+id/tvTemp"
-            android:layout_marginTop="5dp"
-            android:layout_below="@+id/tvStreet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/ivLoc"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color3"/>
-
-        <TextView
-            android:id="@+id/tvHumidity"
-            android:layout_marginTop="5dp"
-            android:layout_below="@+id/tvStreet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/tvTemp"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color3"/>
-
-        <TextView
-            android:id="@+id/tvWind"
-            android:layout_marginTop="5dp"
-            android:layout_below="@+id/tvStreet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/tvHumidity"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color3"/>
-
-        <TextView
-            android:id="@+id/tvVisible"
-            android:layout_marginTop="5dp"
-            android:layout_below="@+id/tvStreet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/tvWind"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color3"/>
-
-        <TextView
-            android:id="@+id/tvThunder"
-            android:layout_marginTop="5dp"
-            android:layout_below="@+id/tvTemp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toEndOf="@+id/ivLoc"
-            android:layout_toStartOf="@+id/ivThunderFar"
-            android:textSize="@dimen/level_5"
-            android:textColor="@color/text_color3"/>
-
-        <ImageView
-            android:id="@+id/ivThunderFar"
-            android:layout_marginTop="5dp"
-            android:layout_below="@+id/tvTemp"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/shawn_icon_thunder_far"/>
+        android:layout_margin="5dp">
 
         <RelativeLayout
-            android:visibility="gone"
-            android:id="@+id/reSeekbar"
-            android:layout_below="@+id/ivThunderFar"
+            android:id="@+id/reLocation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:background="@drawable/shawn_bg_corner_white">
+
             <ImageView
-                android:id="@+id/ivPlay"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_marginTop="5dp"
-                android:padding="5dp"
-                android:src="@drawable/shawn_icon_play"/>
+                android:id="@+id/ivLoc"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="3dp"
+                android:src="@drawable/shawn_icon_location_black"/>
 
             <TextView
-                android:id="@+id/tvSeekbarTime"
+                android:id="@+id/tvPosition"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/level_6"
-                android:textColor="@color/text_color3"/>
+                android:layout_toEndOf="@+id/ivLoc"
+                android:textColor="@color/text_color3"
+                android:textSize="@dimen/level_4"/>
 
-            <SeekBar
-                android:layout_below="@+id/tvSeekbarTime"
-                android:id="@+id/seekBar"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvStreet"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_toEndOf="@+id/ivPlay"
-                android:maxHeight="15dp"
-                android:minHeight="15dp"
-                android:paddingStart="0dp"
-                android:paddingEnd="0dp"
-                android:progressDrawable="@drawable/shawn_seekbar_drawable"
-                android:thumb="@drawable/shawn_seekbar_thumb"
-                android:thumbOffset="0dp"/>
+                android:layout_below="@+id/tvPosition"
+                android:layout_toEndOf="@+id/ivLoc"
+                android:textColor="@color/text_color2"
+                android:textSize="@dimen/level_5"/>
 
-            <LinearLayout
-                android:layout_below="@+id/seekBar"
-                android:id="@+id/llTimeContainer"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical" />
+                android:layout_alignParentEnd="true"
+                android:textColor="@color/text_color2"
+                android:textSize="@dimen/level_5"/>
+
+            <TextView
+                android:id="@+id/tvTemp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvStreet"
+                android:layout_toEndOf="@+id/ivLoc"
+                android:textColor="@color/text_color3"
+                android:textSize="@dimen/level_5"/>
+
+            <TextView
+                android:id="@+id/tvHumidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvStreet"
+                android:layout_toEndOf="@+id/tvTemp"
+                android:textColor="@color/text_color3"
+                android:textSize="@dimen/level_5"/>
+
+            <TextView
+                android:id="@+id/tvWind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvStreet"
+                android:layout_toEndOf="@+id/tvHumidity"
+                android:textColor="@color/text_color3"
+                android:textSize="@dimen/level_5"/>
+
+            <TextView
+                android:id="@+id/tvVisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvStreet"
+                android:layout_toEndOf="@+id/tvWind"
+                android:textColor="@color/text_color3"
+                android:textSize="@dimen/level_5"/>
 
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/reChart"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/reLocation">
+
+            <RelativeLayout
+                android:id="@+id/re"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shawn_bg_corner_white"
+                android:padding="5dp">
+
+                <LinearLayout
+                    android:id="@+id/llThunder"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvThunder"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:singleLine="true"
+                        android:textColor="@color/text_color3"
+                        android:textSize="@dimen/level_5"/>
+
+                    <ImageView
+                        android:id="@+id/ivThunderFar"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:src="@drawable/shawn_icon_thunder_far"/>
+
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/reSeekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/llThunder"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/ivPlay"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_marginTop="5dp"
+                        android:padding="5dp"
+                        android:src="@drawable/shawn_icon_play"/>
+
+                    <TextView
+                        android:id="@+id/tvSeekbarTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_color3"
+                        android:textSize="@dimen/level_6"/>
+
+                    <SeekBar
+                        android:id="@+id/seekBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvSeekbarTime"
+                        android:layout_marginEnd="10dp"
+                        android:layout_toEndOf="@+id/ivPlay"
+                        android:maxHeight="15dp"
+                        android:minHeight="15dp"
+                        android:paddingEnd="0dp"
+                        android:paddingStart="0dp"
+                        android:progressDrawable="@drawable/shawn_seekbar_drawable"
+                        android:thumb="@drawable/shawn_seekbar_thumb"
+                        android:thumbOffset="0dp"/>
+
+                    <LinearLayout
+                        android:id="@+id/llTimeContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/seekBar"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"/>
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
+
+            <TextView
+                android:layout_marginTop="5dp"
+                android:id="@+id/tvRain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/re"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="@dimen/level_4"/>
+
+            <LinearLayout
+                android:id="@+id/llContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvRain"
+                android:orientation="horizontal"
+                android:visibility="visible"/>
+
+        </RelativeLayout>
+
+
+        <ImageView
+            android:id="@+id/ivArrow"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_below="@+id/reChart"
+            android:layout_centerHorizontal="true"
+            android:padding="5dp"
+            android:src="@drawable/shawn_icon_animation_up"/>
 
     </RelativeLayout>
 
     <ImageView
-        android:layout_below="@+id/reTop"
         android:id="@+id/ivCamera"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:layout_below="@+id/reTop"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:src="@drawable/shawn_icon_camera"/>
 
     <ImageView
@@ -191,15 +245,15 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@drawable/shawn_bg_corner_black"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="5dp"
+        android:background="@drawable/shawn_bg_corner_black"
+        android:gravity="center_vertical|center"
+        android:orientation="horizontal"
         android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:gravity="center_vertical|center">
+        android:paddingRight="10dp">
 
         <ImageView
             android:layout_width="15dp"
@@ -229,13 +283,13 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_below="@+id/reTop"
         android:id="@+id/llRight"
         android:layout_width="35dp"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="10dp"
+        android:layout_below="@+id/reTop"
         android:layout_marginEnd="5dp"
+        android:layout_marginTop="5dp"
         android:background="@drawable/shawn_bg_corner_white"
         android:gravity="center_horizontal"
         android:orientation="vertical">
@@ -245,9 +299,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:paddingTop="3dp"
+            android:orientation="vertical"
             android:paddingBottom="3dp"
-            android:orientation="vertical">
+            android:paddingTop="3dp">
 
             <ImageView
                 android:id="@+id/ivRadar"
@@ -270,9 +324,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:paddingTop="3dp"
+            android:orientation="vertical"
             android:paddingBottom="3dp"
-            android:orientation="vertical">
+            android:paddingTop="3dp">
 
             <ImageView
                 android:id="@+id/ivCloud"
@@ -295,9 +349,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:paddingTop="3dp"
+            android:orientation="vertical"
             android:paddingBottom="3dp"
-            android:orientation="vertical">
+            android:paddingTop="3dp">
 
             <ImageView
                 android:id="@+id/ivMore"
@@ -318,16 +372,16 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:clickable="true"
-        android:visibility="gone"
         android:id="@+id/reMore"
-        android:layout_toStartOf="@+id/llRight"
-        android:layout_alignBottom="@+id/llRight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/llRight"
         android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/llRight"
         android:background="@drawable/shawn_bg_corner_white"
-        android:padding="5dp">
+        android:clickable="true"
+        android:padding="5dp"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/ivMoreRadar"
@@ -339,16 +393,16 @@
             android:id="@+id/ivMoreCloud"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_toEndOf="@+id/ivMoreRadar"
             android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/ivMoreRadar"
             android:src="@drawable/shawn_icon_more_cloud"/>
 
         <ImageView
             android:id="@+id/ivMoreRain"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_toEndOf="@+id/ivMoreCloud"
             android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/ivMoreCloud"
             android:src="@drawable/shawn_icon_more_rain"/>
 
         <ImageView
@@ -363,36 +417,36 @@
             android:id="@+id/ivMoreDqdc"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_toEndOf="@+id/ivMoreLb"
             android:layout_below="@+id/ivMoreCloud"
-            android:layout_marginTop="5dp"
             android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/ivMoreLb"
             android:src="@drawable/shawn_icon_more_dqdc"/>
 
         <ImageView
             android:id="@+id/ivMoreYdgd"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_toEndOf="@+id/ivMoreDqdc"
             android:layout_below="@+id/ivMoreRain"
-            android:layout_marginTop="5dp"
             android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@+id/ivMoreDqdc"
             android:src="@drawable/shawn_icon_more_ydgd"/>
 
     </RelativeLayout>
 
     <LinearLayout
-        android:clickable="true"
-        android:visibility="gone"
         android:id="@+id/llSetting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/ivSetting"
         android:layout_alignBottom="@+id/ivSetting"
         android:layout_marginEnd="5dp"
+        android:layout_toStartOf="@+id/ivSetting"
         android:background="@drawable/shawn_bg_corner_white"
+        android:clickable="true"
         android:orientation="vertical"
-        android:padding="5dp">
+        android:padding="5dp"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -461,9 +515,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
             android:layout_marginTop="10dp"
             android:text="显示内容"
-            android:layout_marginBottom="2dp"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/level_4"/>
 
@@ -484,16 +538,16 @@
                 android:id="@+id/ivScenic"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:padding="2dp"
                 android:layout_marginStart="10dp"
+                android:padding="2dp"
                 android:src="@drawable/shawn_icon_scenic"/>
 
             <ImageView
                 android:id="@+id/ivPark"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:padding="2dp"
                 android:layout_marginStart="10dp"
+                android:padding="2dp"
                 android:src="@drawable/shawn_icon_park"/>
 
         </LinearLayout>
@@ -501,9 +555,9 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
             android:layout_marginTop="10dp"
             android:text="闪电发生概率"
-            android:layout_marginBottom="2dp"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/level_4"/>
 
@@ -512,19 +566,19 @@
             android:id="@+id/sbMinute"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:sb_checked_color="@color/colorPrimary"
-            app:sb_checked="false"/>
+            app:sb_checked="false"
+            app:sb_checked_color="@color/colorPrimary"/>
 
     </LinearLayout>
 
     <ImageView
         android:id="@+id/ivSetting"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="5dp"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@+id/llRight"
         android:layout_width="35dp"
         android:layout_height="35dp"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/llRight"
+        android:layout_marginEnd="5dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/shawn_icon_setting"/>
 
     <com.wang.avi.AVLoadingIndicatorView
