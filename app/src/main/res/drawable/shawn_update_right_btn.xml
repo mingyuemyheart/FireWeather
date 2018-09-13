@@ -9,14 +9,14 @@
             <size android:height="35dp" android:width="50dp" />
         </shape></item>
     <item android:state_pressed="true"><shape>
-            <solid android:color="#80EF9A1A" />
+            <solid android:color="#80274AB2" />
 
             <corners android:bottomLeftRadius="0dp" android:bottomRightRadius="5dp" android:topLeftRadius="0dp" android:topRightRadius="0dp" />
 
             <size android:height="35dp" android:width="50dp" />
         </shape></item>
     <item android:state_focused="true"><shape>
-            <solid android:color="#80EF9A1A" />
+            <solid android:color="#80274AB2" />
 
             <corners android:bottomLeftRadius="0dp" android:bottomRightRadius="5dp" android:topLeftRadius="0dp" android:topRightRadius="0dp" />
 

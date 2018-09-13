@@ -23,6 +23,7 @@ public class StrongStreamDto implements Parcelable {
     public float x = 0;//x轴坐标点
     public float y = 0;//y轴坐标点
     public String dataUrl;
+    public boolean isCurrentTime;//是否为当前时刻
 
     //加油站、景点、公园
     public String stationName;
@@ -67,6 +68,7 @@ public class StrongStreamDto implements Parcelable {
         dest.writeFloat(this.x);
         dest.writeFloat(this.y);
         dest.writeString(this.dataUrl);
+        dest.writeByte(this.isCurrentTime ? (byte) 1 : (byte) 0);
         dest.writeString(this.stationName);
         dest.writeString(this.pro);
         dest.writeString(this.city);
@@ -96,6 +98,7 @@ public class StrongStreamDto implements Parcelable {
         this.x = in.readFloat();
         this.y = in.readFloat();
         this.dataUrl = in.readString();
+        this.isCurrentTime = in.readByte() != 0;
         this.stationName = in.readString();
         this.pro = in.readString();
         this.city = in.readString();

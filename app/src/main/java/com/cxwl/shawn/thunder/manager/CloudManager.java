@@ -64,11 +64,11 @@ public class CloudManager {
 			}
 		}
 		
-		private void loadImage(final String startTime, final String url, final Map<String, StrongStreamDto> radars) {
+		private void loadImage(final String startTime, final String imgUrl, final Map<String, StrongStreamDto> radars) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					String imgPath = decodeFromUrl(url, startTime);//图片下载后存放的路径
+					String imgPath = decodeFromUrl(imgUrl, startTime);//图片下载后存放的路径
 					if (!TextUtils.isEmpty(imgPath)) {
 						radars.get(startTime).imgPath = imgPath;
 					}

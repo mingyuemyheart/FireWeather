@@ -112,12 +112,52 @@
             android:layout_alignParentEnd="true"
             android:src="@drawable/shawn_icon_thunder_far"/>
 
-        <LinearLayout
-            android:layout_below="@+id/tvThunder"
-            android:id="@+id/llThunder"
-            android:orientation="horizontal"
+        <RelativeLayout
+            android:visibility="gone"
+            android:id="@+id/reSeekbar"
+            android:layout_below="@+id/ivThunderFar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+            
+            <ImageView
+                android:id="@+id/ivPlay"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="5dp"
+                android:padding="5dp"
+                android:src="@drawable/shawn_icon_play"/>
+
+            <TextView
+                android:id="@+id/tvSeekbarTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/level_6"
+                android:textColor="@color/text_color3"/>
+
+            <SeekBar
+                android:layout_below="@+id/tvSeekbarTime"
+                android:id="@+id/seekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_toEndOf="@+id/ivPlay"
+                android:maxHeight="15dp"
+                android:minHeight="15dp"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:progressDrawable="@drawable/shawn_seekbar_drawable"
+                android:thumb="@drawable/shawn_seekbar_thumb"
+                android:thumbOffset="0dp"/>
+
+            <LinearLayout
+                android:layout_below="@+id/seekBar"
+                android:id="@+id/llTimeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical" />
+
+        </RelativeLayout>
 
     </RelativeLayout>
 
