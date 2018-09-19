@@ -13,6 +13,7 @@ import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ConcurrentModificationException;
 import java.util.Map;
 
 /**
@@ -56,23 +57,31 @@ public class RadarManager {
 		@Override
 		public void run() {
 			super.run();
-			for (String startTime : radars.keySet()) {
-				if (radars.containsKey(startTime)) {
-					StrongStreamDto radar = radars.get(startTime);
-					loadImage(startTime, radar.imgUrl, radars);
+			try {
+				for (String startTime : radars.keySet()) {
+					if (radars.containsKey(startTime)) {
+						StrongStreamDto radar = radars.get(startTime);
+						loadImage(startTime, radar.imgUrl, radars);
+					}
 				}
+			}catch (ConcurrentModificationException e) {
+				e.printStackTrace();
 			}
 		}
 		
-		private void loadImage(final String startTime, final String url, final Map<String, StrongStreamDto> radars) {
+		private void loadImage(final String startTime, final String imgUrl, final Map<String, StrongStreamDto> radars) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					String imgPath = decodeFromUrl(url, startTime);//图片下载后存放的路径
-					if (!TextUtils.isEmpty(imgPath)) {
-						radars.get(startTime).imgPath = imgPath;
+					try {
+						String imgPath = decodeFromUrl(imgUrl, startTime);//图片下载后存放的路径
+						if (!TextUtils.isEmpty(imgPath)) {
+							radars.get(startTime).imgPath = imgPath;
+						}
+						finished(imgPath, radars);
+					}catch (NullPointerException e) {
+						e.printStackTrace();
 					}
-					finished(imgPath, radars);
 				}
 			}).start();
 		}

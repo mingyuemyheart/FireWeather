@@ -73,10 +73,13 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cn.com.weather.api.WeatherAPI;
 import cn.com.weather.beans.Weather;
@@ -111,6 +114,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.CHINA);
     private int width;
     private AVLoadingIndicatorView loadingView;
+    private boolean isFirstResume = true;
 
     //雷电、雷达图
     private SeekBar seekBar;
@@ -280,6 +284,8 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         leibaoManager = new LeibaoManager(getActivity());
         yundingManager = new YdgdManager(getActivity());
 
+        startTimer();
+
     }
 
     /**
@@ -304,13 +310,20 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         aMap.setOnMapLoadedListener(new AMap.OnMapLoadedListener() {
             @Override
             public void onMapLoaded() {
-                if (CommonUtil.isLocationOpen(getActivity())) {
-                    startLocation();
-                }else {
-                    locationComplete("北京市", "东城区", "正义路", "2号", 39.904030, 116.407526);
-                }
+                mapLoaded();
             }
         });
+    }
+
+    /**
+     * 地图加载完毕事件
+     */
+    private void mapLoaded() {
+        if (CommonUtil.isLocationOpen(getActivity())) {
+            startLocation();
+        }else {
+            locationComplete("北京市", "东城区", "正义路", "2号", 39.904030, 116.407526);
+        }
     }
 
     /**
@@ -348,10 +361,28 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         tvStreet.setText(street+streetNum);
         locationLatLng = new LatLng(lat, lng);
         addLocationMarker();
-        OkHttpThunder();
         OkHttpThunderForecast(locationLatLng.longitude, locationLatLng.latitude);
+        OkHttpThunder();
         OkHttpMinute(locationLatLng.longitude, locationLatLng.latitude);
         OkHttpGeo(locationLatLng.longitude, locationLatLng.latitude);
+
+        //选中状态下，更新数据
+        if (isShowCloud) {
+            cloudDataMap.clear();
+            OkHttpCloud();
+        }
+        if (isShowRain) {
+            rainDataMap.clear();
+            OkHttpRain();
+        }
+        if (isShowLeibao) {
+            leibaoDataMap.clear();
+            OkHttpLeibao();
+        }
+        if (isShowYunding) {
+            yundingDataMap.clear();
+            OkHttpYunding();
+        }
     }
 
     private void addLocationMarker() {
@@ -933,6 +964,8 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                 radarThread = new RadarThread(radarList);
                                                 radarThread.index = currentIndex;
                                             }
+
+                                            ivPlay.setImageResource(R.drawable.shawn_icon_play);
                                             reSeekbar.setVisibility(View.VISIBLE);
                                             loadingView.setVisibility(View.GONE);
 
@@ -1397,13 +1430,16 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         new Thread(new Runnable() {
             @Override
             public void run() {
-                for (int i = 0; i < thunderMarkers.size(); i++) {
-                    Marker marker = thunderMarkers.get(i);
-                    if (marker != null) {
-                        marker.remove();
+                try {
+                    for (Marker marker : thunderMarkers) {
+                        if (marker != null) {
+                            marker.remove();
+                        }
                     }
+                    thunderMarkers.clear();
+                }catch (ConcurrentModificationException e) {
+                    e.printStackTrace();
                 }
-                thunderMarkers.clear();
             }
         }).start();
     }
@@ -1420,27 +1456,31 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if (thunderDataMap.containsKey(startTime)) {
-                    LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    List<StrongStreamDto> list = thunderDataMap.get(startTime);
-                    for (StrongStreamDto dto : list) {
-                        MarkerOptions options = new MarkerOptions();
-                        options.anchor(1.0f, 0.0f);
-                        options.position(new LatLng(dto.lat, dto.lng));
-                        View view = inflater.inflate(R.layout.shawn_thunder_marker, null);
-                        ImageView ivMarker = view.findViewById(R.id.ivMarker);
-                        if (TextUtils.equals(dto.type, "0")) {
-                            ivMarker.setImageResource(R.drawable.shawn_icon_thunder_diji);
-                        }else if (TextUtils.equals(dto.type, "1")){
-                            ivMarker.setImageResource(R.drawable.shawn_icon_thunder_luji);
+                try {
+                    if (thunderDataMap.containsKey(startTime)) {
+                        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                        List<StrongStreamDto> list = thunderDataMap.get(startTime);
+                        for (StrongStreamDto dto : list) {
+                            MarkerOptions options = new MarkerOptions();
+                            options.anchor(1.0f, 0.0f);
+                            options.position(new LatLng(dto.lat, dto.lng));
+                            View view = inflater.inflate(R.layout.shawn_thunder_marker, null);
+                            ImageView ivMarker = view.findViewById(R.id.ivMarker);
+                            if (TextUtils.equals(dto.type, "0")) {
+                                ivMarker.setImageResource(R.drawable.shawn_icon_thunder_diji);
+                            }else if (TextUtils.equals(dto.type, "1")){
+                                ivMarker.setImageResource(R.drawable.shawn_icon_thunder_luji);
+                            }
+                            options.icon(BitmapDescriptorFactory.fromView(view));
+                            Marker marker = aMap.addMarker(options);
+                            marker.setClickable(false);
+                            marker.setVisible(true);
+                            thunderMarkers.add(marker);
+                            expandMarker(marker);
                         }
-                        options.icon(BitmapDescriptorFactory.fromView(view));
-                        Marker marker = aMap.addMarker(options);
-                        marker.setClickable(false);
-                        marker.setVisible(true);
-                        thunderMarkers.add(marker);
-                        expandMarker(marker);
                     }
+                }catch (ConcurrentModificationException e) {
+                    e.printStackTrace();
                 }
             }
         }).start();
@@ -2726,6 +2766,12 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         if (mapView != null) {
             mapView.onResume();
         }
+
+        //判断是否为第一次加载onResume事件，如果不是更新数据
+        if (!isFirstResume) {
+            mapLoaded();
+        }
+        isFirstResume = false;
     }
 
     /**
@@ -2764,6 +2810,36 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         removeRadarOverlay();
         removeCloudOverlay();
         removeYundingOverlay();
+
+        resetTimer();
+    }
+
+    private Timer timer;
+    private void startTimer() {
+        if (timer == null) {
+            timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mapLoaded();
+                        }
+                    });
+                }
+            }, 0, 1000*60*3);
+        }
+    }
+
+    /**
+     * 重置计时器
+     */
+    private void resetTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
 }
