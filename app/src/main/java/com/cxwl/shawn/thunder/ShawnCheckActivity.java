@@ -38,7 +38,7 @@ import okhttp3.Response;
 /**
  * 审核
  */
-public class ShawnCheckActivity extends BaseActivity implements View.OnClickListener {
+public class ShawnCheckActivity extends ShawnBaseActivity implements View.OnClickListener {
 
 	private Context mContext;
 	private ShawnCheckAdapter mAdapter;
@@ -179,9 +179,7 @@ public class ShawnCheckActivity extends BaseActivity implements View.OnClickList
 				OkHttpUtil.enqueue(new Request.Builder().post(body).url(url).build(), new Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
-
 					}
-
 					@Override
 					public void onResponse(Call call, Response response) throws IOException {
 						if (!response.isSuccessful()) {
@@ -220,9 +218,7 @@ public class ShawnCheckActivity extends BaseActivity implements View.OnClickList
 				OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
-
 					}
-
 					@Override
 					public void onResponse(Call call, Response response) throws IOException {
 						if (!response.isSuccessful()) {

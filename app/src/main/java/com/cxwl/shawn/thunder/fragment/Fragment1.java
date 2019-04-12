@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -46,12 +47,17 @@ import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.animation.Animation;
 import com.amap.api.maps.model.animation.ScaleAnimation;
+import com.amap.api.services.core.AMapException;
+import com.amap.api.services.core.LatLonPoint;
+import com.amap.api.services.geocoder.GeocodeResult;
+import com.amap.api.services.geocoder.GeocodeSearch;
+import com.amap.api.services.geocoder.RegeocodeQuery;
+import com.amap.api.services.geocoder.RegeocodeResult;
 import com.cxwl.shawn.thunder.PictureLibraryActivity;
 import com.cxwl.shawn.thunder.R;
 import com.cxwl.shawn.thunder.ThunderFarActivity;
 import com.cxwl.shawn.thunder.ThunderUploadActivity;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
-import com.cxwl.shawn.thunder.dto.WeatherDto;
 import com.cxwl.shawn.thunder.manager.CloudManager;
 import com.cxwl.shawn.thunder.manager.LeibaoManager;
 import com.cxwl.shawn.thunder.manager.RadarManager;
@@ -61,7 +67,6 @@ import com.cxwl.shawn.thunder.util.CommonUtil;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.util.SecretUrlUtil;
 import com.cxwl.shawn.thunder.util.WeatherUtil;
-import com.cxwl.shawn.thunder.view.MinuteFallView;
 import com.cxwl.shawn.thunder.view.SeekbarTime;
 import com.wang.avi.AVLoadingIndicatorView;
 
@@ -93,7 +98,7 @@ import okhttp3.Response;
 /**
  * 预报
  */
-public class Fragment1 extends Fragment implements View.OnClickListener, AMap.OnMarkerClickListener, AMap.InfoWindowAdapter, AMap.OnCameraChangeListener {
+public class Fragment1 extends Fragment implements View.OnClickListener, AMap.OnMapClickListener, AMap.OnMarkerClickListener, AMap.InfoWindowAdapter, AMap.OnCameraChangeListener, GeocodeSearch.OnGeocodeSearchListener {
 
     private TextureMapView mapView;
     private AMap aMap;//高德地图
@@ -103,23 +108,21 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private AMapLocationClient mLocationClient;//声明AMapLocationClient类对象
     private Marker locationMarker;
     private LatLng locationLatLng;
-    private RelativeLayout reTop,reChart;
-    private boolean isShowDetail = true;//是否显示上方详情
-    private ImageView ivArrow,ivRadar,ivCloud,ivMore,ivPlay;
-    private LinearLayout llContainer,llTimeContainer,llRadar,llCloud,llMore;
-    private TextView tvPosition,tvStreet,tvTime,tvTemp,tvHumidity,tvWind,tvVisible,tvRain,tvThunder,tvRadar,tvCloud,tvMore,tvSeekbarTime;
+    private ImageView iv1,iv2,ivMore,ivPlay,ivLegend;
+    private LinearLayout llTimeContainer,ll1,ll2,llMore;
+    private TextView tvPosition,tvStreet,tvTime,tvFact,tvThunder,tv1,tv2,tvMore,tvSeekbarTime;
     private SimpleDateFormat sdf1 = new SimpleDateFormat("HH:mm", Locale.CHINA);
     private SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
     private SimpleDateFormat sdf3 = new SimpleDateFormat("yyyyMMddHHmm", Locale.CHINA);
     private SimpleDateFormat sdf4 = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.CHINA);
     private int width;
     private AVLoadingIndicatorView loadingView;
-    private boolean isFirstResume = true;
+    private GeocodeSearch geocoderSearch;
+    private boolean isShowThunderMarkers = true;//是否显示雷电markers
 
     //雷电、雷达图
     private SeekBar seekBar;
     private float seekBarWidth,itemWidth,leftMargin,rightMargin,scrollX;
-    private RelativeLayout reSeekbar;
     private boolean isShowRadar = false;//是否显示雷达图
     private Map<String, List<StrongStreamDto>> thunderDataMap = new LinkedHashMap<>();//雷电数据集合
     private List<Marker> thunderMarkers = new ArrayList<>();//雷电markers结合
@@ -135,22 +138,26 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private RadarManager radarManager;
     private RadarThread radarThread;
 
-    //云图
-    private boolean isShowCloud = false;//是否显示云图
-    private Map<String, StrongStreamDto> cloudDataMap = new LinkedHashMap<>();//云图数据集合,时间、雷达图对应地址,linked按照顺序输出
-    private GroundOverlay cloudOverlay;//云图
-    private CloudManager cloudManager;
-
-    //更多
-    private RelativeLayout reMore;
-    private boolean isShowMore = false;//是否显示更多layout
-    private ImageView ivMoreRadar,ivMoreCloud,ivMoreRain,ivMoreLb,ivMoreDqdc,ivMoreYdgd;
-
     //降水
     private boolean isShowRain = false;//是否显示降水图
     private Map<String, StrongStreamDto> rainDataMap = new LinkedHashMap<>();//降水图数据集合,时间、图对应地址,linked按照顺序输出
     private GroundOverlay rainOverlay;
     private RainManager rainManager;
+
+    //云顶高度
+    private boolean isShowYunding = false;//是否显示云顶高度图
+    private Map<String, StrongStreamDto> yundingDataMap = new LinkedHashMap<>();//云顶高度图数据集合,时间、图对应地址,linked按照顺序输出
+    private GroundOverlay yundingOverlay;
+    private YdgdManager yundingManager;
+
+    //低能见度
+    private boolean isShowVisible = false;
+
+    //云顶低度
+    private boolean isShowCloud = false;//是否显示云图
+    private Map<String, StrongStreamDto> cloudDataMap = new LinkedHashMap<>();//云图数据集合,时间、雷达图对应地址,linked按照顺序输出
+    private GroundOverlay cloudOverlay;//云图
+    private CloudManager cloudManager;
 
     //雷暴云图
     private boolean isShowLeibao = false;//是否显示雷暴云图
@@ -158,11 +165,10 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private GroundOverlay leibaoOverlay;
     private LeibaoManager leibaoManager;
 
-    //云顶高度
-    private boolean isShowYunding = false;//是否显示云顶高度图
-    private Map<String, StrongStreamDto> yundingDataMap = new LinkedHashMap<>();//云顶高度图数据集合,时间、图对应地址,linked按照顺序输出
-    private GroundOverlay yundingOverlay;
-    private YdgdManager yundingManager;
+    //更多
+    private RelativeLayout reMore;
+    private boolean isShowMore = false;//是否显示更多layout
+    private ImageView ivMore1,ivMore2,ivMore3,ivMore4,ivMore5,ivMore6;
 
     //设置
     private LinearLayout llSetting;
@@ -182,8 +188,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.shawn_fragment1, null);
-        return view;
+        return inflater.inflate(R.layout.shawn_fragment1, null);
     }
 
     @Override
@@ -197,61 +202,55 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         loadingView = view.findViewById(R.id.loadingView);
         ImageView ivLocation = view.findViewById(R.id.ivLocation);
         ivLocation.setOnClickListener(this);
+        ImageView ivLg = view.findViewById(R.id.ivLg);
+        ivLg.setOnClickListener(this);
+        ivLegend = view.findViewById(R.id.ivLegend);
         ImageView ivCamera = view.findViewById(R.id.ivCamera);
         ivCamera.setOnClickListener(this);
         ImageView ivPicture = view.findViewById(R.id.ivPicture);
         ivPicture.setOnClickListener(this);
         ImageView ivThunderFar = view.findViewById(R.id.ivThunderFar);
         ivThunderFar.setOnClickListener(this);
-        reTop = view.findViewById(R.id.reTop);
-        reTop.setOnClickListener(this);
-        reChart = view.findViewById(R.id.reChart);
-        ivArrow = view.findViewById(R.id.ivArrow);
-        ivArrow.setOnClickListener(this);
-        ivRadar = view.findViewById(R.id.ivRadar);
-        ivCloud = view.findViewById(R.id.ivCloud);
+        iv1 = view.findViewById(R.id.iv1);
+        iv2 = view.findViewById(R.id.iv2);
         ivMore = view.findViewById(R.id.ivMore);
-        tvRadar = view.findViewById(R.id.tvRadar);
-        tvCloud = view.findViewById(R.id.tvCloud);
+        tv1 = view.findViewById(R.id.tv1);
+        tv2 = view.findViewById(R.id.tv2);
         tvMore = view.findViewById(R.id.tvMore);
-        llRadar = view.findViewById(R.id.llRadar);
-        llRadar.setOnClickListener(this);
-        llCloud = view.findViewById(R.id.llCloud);
-        llCloud.setOnClickListener(this);
+        ll1 = view.findViewById(R.id.ll1);
+        ll1.setOnClickListener(this);
+        ll2 = view.findViewById(R.id.ll2);
+        ll2.setOnClickListener(this);
         llMore = view.findViewById(R.id.llMore);
         llMore.setOnClickListener(this);
+        LinearLayout llThunder = view.findViewById(R.id.llThunder);
+        llThunder.setOnClickListener(this);
         tvPosition = view.findViewById(R.id.tvPosition);
         tvStreet = view.findViewById(R.id.tvStreet);
         tvTime = view.findViewById(R.id.tvTime);
-        tvTemp = view.findViewById(R.id.tvTemp);
-        tvHumidity = view.findViewById(R.id.tvHumidity);
-        tvWind = view.findViewById(R.id.tvWind);
-        tvVisible = view.findViewById(R.id.tvVisible);
-        tvRain = view.findViewById(R.id.tvRain);
+        tvFact = view.findViewById(R.id.tvFact);
         tvThunder = view.findViewById(R.id.tvThunder);
-        llContainer = view.findViewById(R.id.llContainer);
         llTimeContainer = view.findViewById(R.id.llTimeContainer);
         tvSeekbarTime = view.findViewById(R.id.tvSeekbarTime);
         ivPlay = view.findViewById(R.id.ivPlay);
         ivPlay.setOnClickListener(this);
         seekBar = view.findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(seekbarChangeListener);
-        reSeekbar = view.findViewById(R.id.reSeekbar);
 
         //更多
         reMore = view.findViewById(R.id.reMore);
-        ivMoreRadar = view.findViewById(R.id.ivMoreRadar);
-        ivMoreRadar.setOnClickListener(this);
-        ivMoreCloud = view.findViewById(R.id.ivMoreCloud);
-        ivMoreCloud.setOnClickListener(this);
-        ivMoreRain = view.findViewById(R.id.ivMoreRain);
-        ivMoreRain.setOnClickListener(this);
-        ivMoreLb = view.findViewById(R.id.ivMoreLb);
-        ivMoreLb.setOnClickListener(this);
-        ivMoreDqdc = view.findViewById(R.id.ivMoreDqdc);
-        ivMoreDqdc.setOnClickListener(this);
-        ivMoreYdgd = view.findViewById(R.id.ivMoreYdgd);
-        ivMoreYdgd.setOnClickListener(this);
+        ivMore1 = view.findViewById(R.id.ivMore1);
+        ivMore1.setOnClickListener(this);
+        ivMore2 = view.findViewById(R.id.ivMore2);
+        ivMore2.setOnClickListener(this);
+        ivMore3 = view.findViewById(R.id.ivMore3);
+        ivMore3.setOnClickListener(this);
+        ivMore4 = view.findViewById(R.id.ivMore4);
+        ivMore4.setOnClickListener(this);
+        ivMore5 = view.findViewById(R.id.ivMore5);
+        ivMore5.setOnClickListener(this);
+        ivMore6 = view.findViewById(R.id.ivMore6);
+        ivMore6.setOnClickListener(this);
 
         //设置
         llSetting = view.findViewById(R.id.llSetting);
@@ -278,6 +277,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         seekBarWidth = width-leftMargin-rightMargin;
         scrollX = leftMargin;
 
+        geocoderSearch = new GeocodeSearch(getActivity());
+        geocoderSearch.setOnGeocodeSearchListener(this);
+
         radarManager = new RadarManager(getActivity());
         cloudManager = new CloudManager(getActivity());
         rainManager = new RainManager(getActivity());
@@ -302,17 +304,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         aMap.getUiSettings().setZoomControlsEnabled(false);
         aMap.getUiSettings().setRotateGesturesEnabled(false);
         aMap.setMapType(AMapType);
-//        aMap.setOnMapClickListener(this);
+        aMap.setOnMapClickListener(this);
         aMap.setOnMarkerClickListener(this);
         aMap.setInfoWindowAdapter(this);
 //        aMap.setOnInfoWindowClickListener(this);
         aMap.setOnCameraChangeListener(this);
-        aMap.setOnMapLoadedListener(new AMap.OnMapLoadedListener() {
-            @Override
-            public void onMapLoaded() {
-                mapLoaded();
-            }
-        });
     }
 
     /**
@@ -357,31 +353,33 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     }
 
     private void locationComplete(String city, String dis, String street, String streetNum, double lat, double lng) {
+        if (radarThread != null) {
+            radarThread.pause();
+        }
         tvPosition.setText(city+" | "+dis);
         tvStreet.setText(street+streetNum);
         locationLatLng = new LatLng(lat, lng);
         addLocationMarker();
         OkHttpThunderForecast(locationLatLng.longitude, locationLatLng.latitude);
         OkHttpThunder();
-        OkHttpMinute(locationLatLng.longitude, locationLatLng.latitude);
         OkHttpGeo(locationLatLng.longitude, locationLatLng.latitude);
 
         //选中状态下，更新数据
-        if (isShowCloud) {
-            cloudDataMap.clear();
-            OkHttpCloud();
-        }
         if (isShowRain) {
             rainDataMap.clear();
             OkHttpRain();
         }
-        if (isShowLeibao) {
-            leibaoDataMap.clear();
-            OkHttpLeibao();
-        }
         if (isShowYunding) {
             yundingDataMap.clear();
             OkHttpYunding();
+        }
+        if (isShowCloud) {
+            cloudDataMap.clear();
+            OkHttpCloud();
+        }
+        if (isShowLeibao) {
+            leibaoDataMap.clear();
+            OkHttpLeibao();
         }
     }
 
@@ -476,32 +474,33 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
 //                                                    tvTime.setText(sdf1.format(new Date())+" "+time+"发布");
 //                                                }
 //                                            }
+                                            String factTemp = "", humidity = "", wind = "", visible = "";
                                             if (!l.isNull("l1")) {
-                                                String factTemp = WeatherUtil.lastValue(l.getString("l1"));
-                                                tvTemp.setText("温度"+factTemp+"℃ | ");
+                                                factTemp = "温度"+WeatherUtil.lastValue(l.getString("l1"))+"℃ | ";
                                             }
                                             if (!l.isNull("l2")) {
-                                                String humidity = WeatherUtil.lastValue(l.getString("l2"));
+                                                humidity = WeatherUtil.lastValue(l.getString("l2"));
                                                 if (TextUtils.isEmpty(humidity) || TextUtils.equals(humidity, "null")) {
-                                                    tvHumidity.setText("湿度" + "-- | ");
+                                                    humidity = "湿度" + "-- | ";
                                                 }else {
-                                                    tvHumidity.setText("湿度"+humidity+"% | ");
+                                                    humidity = "湿度"+humidity+"% | ";
                                                 }
                                             }
                                             if (!l.isNull("l4")) {
                                                 String windDir = WeatherUtil.lastValue(l.getString("l4"));
                                                 if (!l.isNull("l3")) {
                                                     String windForce = WeatherUtil.lastValue(l.getString("l3"));
-                                                    tvWind.setText(getString(WeatherUtil.getWindDirection(Integer.valueOf(windDir))) +
-                                                            WeatherUtil.getFactWindForce(Integer.valueOf(windForce))+" | ");
+                                                    wind = getString(WeatherUtil.getWindDirection(Integer.valueOf(windDir))) +
+                                                            WeatherUtil.getFactWindForce(Integer.valueOf(windForce))+" | ";
                                                 }
                                             }
                                             if (!l.isNull("l9")) {
-                                                String visible = WeatherUtil.lastValue(l.getString("l9"));
+                                                visible = WeatherUtil.lastValue(l.getString("l9"));
                                                 if (!TextUtils.isEmpty(visible)) {
-                                                    tvVisible.setText("能见度"+Float.valueOf(visible)/1000.0f+"km");
+                                                    visible = "能见度"+Float.valueOf(visible)/1000.0f+"km";
                                                 }
                                             }
+                                            tvFact.setText(factTemp+humidity+wind+visible);
                                         }
 
                                     } catch (JSONException e) {
@@ -516,73 +515,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     @Override
                     public void onError(Throwable error, String content) {
                         super.onError(error, content);
-                    }
-                });
-            }
-        }).start();
-    }
-
-    /**
-     * 获取分钟降水信息
-     * @param lng
-     * @param lat
-     */
-    private void OkHttpMinute(double lng, double lat) {
-        final String url = "http://api.caiyunapp.com/v2/HyTVV5YAkoxlQ3Zd/"+lng+","+lat+"/forecast";
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        if (!response.isSuccessful()) {
-                            return;
-                        }
-                        final String result = response.body().string();
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (!TextUtils.isEmpty(result)) {
-                                    try {
-                                        JSONObject object = new JSONObject(result);
-                                        if (!object.isNull("result")) {
-                                            JSONObject obj = object.getJSONObject("result");
-                                            if (!obj.isNull("minutely")) {
-                                                JSONObject objMin = obj.getJSONObject("minutely");
-                                                if (!objMin.isNull("description")) {
-                                                    String rain = objMin.getString("description");
-                                                    if (!TextUtils.isEmpty(rain)) {
-                                                        tvRain.setText(rain.replace("小彩云", ""));
-                                                        tvRain.setVisibility(View.VISIBLE);
-                                                    }else {
-                                                        tvRain.setVisibility(View.GONE);
-                                                    }
-                                                }
-                                                if (!objMin.isNull("precipitation_2h")) {
-                                                    JSONArray array = objMin.getJSONArray("precipitation_2h");
-                                                    List<WeatherDto> minuteList = new ArrayList<>();
-                                                    for (int i = 0; i < array.length(); i++) {
-                                                        WeatherDto dto = new WeatherDto();
-                                                        dto.minuteFall = (float) array.getDouble(i);
-                                                        minuteList.add(dto);
-                                                    }
-
-                                                    MinuteFallView minuteFallView = new MinuteFallView(getActivity());
-                                                    minuteFallView.setData(minuteList, tvRain.getText().toString());
-                                                    llContainer.removeAllViews();
-                                                    llContainer.addView(minuteFallView, width, (int)(CommonUtil.dip2px(getActivity(), 120)));
-                                                }
-                                            }
-                                        }
-                                    } catch (JSONException e1) {
-                                        e1.printStackTrace();
-                                    }
-                                }
-                            }
-                        });
                     }
                 });
             }
@@ -656,9 +588,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                 JSONObject object = new JSONObject(result);
 
                                 //闪电数据
+                                thunderDataMap.clear();
                                 if (!object.isNull("lightning")) {
                                     JSONObject obj = object.getJSONObject("lightning");
-                                    thunderDataMap.clear();
                                     if (!obj.isNull("observe")) {
                                         JSONArray array = obj.getJSONArray("observe");
                                         for (int i = 0; i < array.length(); i++) {
@@ -733,11 +665,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                 }
 
                                 //强对流图层数据
+                                scwWindDataMap.clear();
+                                scwRainDataMap.clear();
+                                scwHailDataMap.clear();
                                 if (!object.isNull("cn_scw")) {
                                     JSONObject obj = object.getJSONObject("cn_scw");
-                                    scwWindDataMap.clear();
-                                    scwRainDataMap.clear();
-                                    scwHailDataMap.clear();
 
                                     //实况
                                     if (!obj.isNull("obs")) {
@@ -883,13 +815,13 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                 }
 
                                 //雷达图层数据
+                                radarDataMap.clear();
+                                radarList.clear();
                                 if (!object.isNull("radar")) {
-                                    radarDataMap.clear();
-                                    radarList.clear();
                                     JSONObject obj = object.getJSONObject("radar");
 
                                     if (!obj.isNull("files_before")) {
-                                        JSONArray array = new JSONArray(obj.getString("files_before"));
+                                        JSONArray array = obj.getJSONArray("files_before");
                                         for (int i = 0; i < array.length(); i++) {
                                             String itemUrl = array.getString(i);
                                             if (!TextUtils.isEmpty(itemUrl)) {
@@ -908,7 +840,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                     }
 
                                     if (!obj.isNull("files_after")) {
-                                        JSONArray array = new JSONArray(obj.getString("files_after"));
+                                        JSONArray array = obj.getJSONArray("files_after");
                                         for (int i = 0; i < array.length(); i++) {
                                             String itemUrl = array.getString(i);
                                             StrongStreamDto dto = new StrongStreamDto();
@@ -925,49 +857,57 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                             if (radarList.size() <= 0) {
                                                 return;
                                             }
-
-                                            int currentIndex = 0;
-                                            for (int i = 0; i < radarList.size(); i++) {
-                                                StrongStreamDto data = radarList.get(i);
-                                                //绘制当前时刻时间
-                                                if (data.isCurrentTime) {
-                                                    currentIndex = i;
+                                            try {
+                                                int currentIndex = 0;
+                                                for (int i = 0; i < radarList.size(); i++) {
+                                                    StrongStreamDto data = radarList.get(i);
+                                                    //绘制当前时刻时间
+                                                    if (data.isCurrentTime) {
+                                                        currentIndex = i;
+                                                    }
                                                 }
-                                            }
 
-                                            seekBar.setMax(radarList.size()-1);
-                                            seekBar.setSecondaryProgress(currentIndex);
-                                            seekBar.setProgress(currentIndex);
-                                            itemWidth = seekBarWidth/radarList.size();
+                                                seekBar.setMax(radarList.size()-1);
+                                                seekBar.setSecondaryProgress(currentIndex);
+                                                seekBar.setProgress(currentIndex);
+                                                itemWidth = seekBarWidth/radarList.size();
 
-                                            if (!TextUtils.isEmpty(radarList.get(currentIndex).startTime)) {
-                                                try {
-                                                    tvSeekbarTime.setText(sdf1.format(sdf3.parse(radarList.get(currentIndex).startTime)));
-                                                    tvSeekbarTime.measure(0, 0);
-                                                    TranslateAnimation anim = new TranslateAnimation(scrollX,leftMargin-tvSeekbarTime.getMeasuredWidth()+itemWidth*currentIndex,0,0);
-                                                    anim.setDuration(50);
-                                                    anim.setFillAfter(true);
-                                                    tvSeekbarTime.setAnimation(anim);
-                                                    scrollX = leftMargin-tvSeekbarTime.getMeasuredWidth()+itemWidth*currentIndex;
-                                                } catch (ParseException e) {
-                                                    e.printStackTrace();
+                                                if (!TextUtils.isEmpty(radarList.get(currentIndex).startTime)) {
+                                                    try {
+                                                        tvSeekbarTime.setText(sdf1.format(sdf3.parse(radarList.get(currentIndex).startTime)));
+                                                        tvSeekbarTime.measure(0, 0);
+                                                        TranslateAnimation anim = new TranslateAnimation(scrollX,leftMargin-tvSeekbarTime.getMeasuredWidth()+itemWidth*currentIndex,0,0);
+                                                        anim.setDuration(50);
+                                                        anim.setFillAfter(true);
+                                                        tvSeekbarTime.setAnimation(anim);
+                                                        scrollX = leftMargin-tvSeekbarTime.getMeasuredWidth()+itemWidth*currentIndex;
+                                                    } catch (IndexOutOfBoundsException e) {
+                                                        e.printStackTrace();
+                                                    } catch (ParseException e) {
+                                                        e.printStackTrace();
+                                                    }
                                                 }
+
+                                                //添加时间轴时间
+                                                llTimeContainer.removeAllViews();
+                                                SeekbarTime seekbarTime = new SeekbarTime(getActivity());
+                                                seekbarTime.setData(radarList);
+                                                llTimeContainer.addView(seekbarTime, width, (int)CommonUtil.dip2px(getActivity(), 15));
+
+                                                if (radarThread == null) {
+                                                    radarThread = new RadarThread(radarList);
+                                                    radarThread.index = currentIndex;
+                                                }
+
+                                                ivPlay.setImageResource(R.drawable.shawn_icon_play);
+                                                ivPlay.setVisibility(View.VISIBLE);
+                                                tvSeekbarTime.setVisibility(View.VISIBLE);
+                                                seekBar.setVisibility(View.VISIBLE);
+                                                llTimeContainer.setVisibility(View.VISIBLE);
+                                                loadingView.setVisibility(View.GONE);
+                                            } catch (IndexOutOfBoundsException e) {
+                                                e.printStackTrace();
                                             }
-
-                                            //添加时间轴时间
-                                            llTimeContainer.removeAllViews();
-                                            SeekbarTime seekbarTime = new SeekbarTime(getActivity());
-                                            seekbarTime.setData(radarList);
-                                            llTimeContainer.addView(seekbarTime, width, (int)CommonUtil.dip2px(getActivity(), 15));
-
-                                            if (radarThread == null) {
-                                                radarThread = new RadarThread(radarList);
-                                                radarThread.index = currentIndex;
-                                            }
-
-                                            ivPlay.setImageResource(R.drawable.shawn_icon_play);
-                                            reSeekbar.setVisibility(View.VISIBLE);
-                                            loadingView.setVisibility(View.GONE);
 
                                         }
                                     });
@@ -993,9 +933,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     private SeekBar.OnSeekBarChangeListener seekbarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (radarThread != null) {
-                radarThread.setCurrent(seekBar.getProgress());
-            }
+//            if (radarThread != null) {
+//                radarThread.setCurrent(seekBar.getProgress());
+//            }
         }
 
         @Override
@@ -1008,6 +948,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             if (radarThread != null) {
+                radarThread.setCurrent(seekBar.getProgress());
                 radarThread.stopTracking();
             }
         }
@@ -1121,94 +1062,96 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     /**
      * 绘制所有要素
      */
-    private void drawMutiElement(String startTime) {
-        removeThunderMarkers();
-        removeScwLayer();
-        if (!TextUtils.isEmpty(startTime)) {
-            //绘制闪电数据
-            if (thunderDataMap.containsKey(startTime)) {
-                drawThunderMarkers(startTime);
-            }
-
-            //绘制强对流数据图层
-            drawScwLayer(startTime);
-        }
-
-        //绘制对应时间的雷达图
-        if (isShowRadar) {
-            if (radarDataMap.containsKey(startTime)) {
-                StrongStreamDto dto = radarDataMap.get(startTime);
-                if (!TextUtils.isEmpty(dto.imgPath)) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
-                    if (bitmap != null) {
-                        drawRadarImg(bitmap);
+    private void drawMutiElement(final String startTime) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (!TextUtils.isEmpty(startTime)) {
+                    //绘制闪电数据
+                    if (thunderDataMap.containsKey(startTime)) {
+                        drawThunderMarkers(startTime);
                     }
-                }else {
-                    removeRadarOverlay();
+
+                    //绘制强对流数据图层
+                    drawScwLayer(startTime);
+                }
+
+                //绘制对应时间的雷达图
+                if (isShowRadar) {
+                    if (radarDataMap.containsKey(startTime)) {
+                        StrongStreamDto dto = radarDataMap.get(startTime);
+                        if (!TextUtils.isEmpty(dto.imgPath)) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                            if (bitmap != null) {
+                                drawRadarImg(bitmap);
+                            }
+                        }else {
+                            removeRadarOverlay();
+                        }
+                    }
+                }
+
+                //绘制对应时间的降水图
+                if (isShowRain) {
+                    if (rainDataMap.containsKey(startTime)) {
+                        StrongStreamDto dto = rainDataMap.get(startTime);
+                        if (!TextUtils.isEmpty(dto.imgPath)) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                            if (bitmap != null) {
+                                drawRainImg(bitmap, dto);
+                            }
+                        }else {
+                            removeRainOverlay();
+                        }
+                    }
+                }
+
+                //绘制对应时间的云顶高度图
+                if (isShowYunding) {
+                    if (yundingDataMap.containsKey(startTime)) {
+                        StrongStreamDto dto = yundingDataMap.get(startTime);
+                        if (!TextUtils.isEmpty(dto.imgPath)) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                            if (bitmap != null) {
+                                drawYundingImg(bitmap, dto);
+                            }
+                        }else {
+                            removeYundingOverlay();
+                        }
+                    }
+                }
+
+                //绘制对应时间的云顶低度
+                if (isShowCloud) {
+                    if (cloudDataMap.containsKey(startTime)) {
+                        StrongStreamDto dto = cloudDataMap.get(startTime);
+                        if (!TextUtils.isEmpty(dto.imgPath)) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                            if (bitmap != null) {
+                                drawCloudImg(bitmap, dto);
+                            }
+                        }else {
+                            removeCloudOverlay();
+                        }
+                    }
+                }
+
+                //绘制对应时间的雷暴云图
+                if (isShowLeibao) {
+                    if (leibaoDataMap.containsKey(startTime)) {
+                        StrongStreamDto dto = leibaoDataMap.get(startTime);
+                        if (!TextUtils.isEmpty(dto.imgPath)) {
+                            Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
+                            if (bitmap != null) {
+                                drawLeibaoImg(bitmap, dto);
+                            }
+                        }else {
+                            removeLeibaoOverlay();
+                        }
+                    }
                 }
             }
-        }
-
-        //绘制对应时间的云图
-        if (isShowCloud) {
-            if (cloudDataMap.containsKey(startTime)) {
-                StrongStreamDto dto = cloudDataMap.get(startTime);
-                if (!TextUtils.isEmpty(dto.imgPath)) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
-                    if (bitmap != null) {
-                        drawCloudImg(bitmap, dto);
-                    }
-                }else {
-                    removeCloudOverlay();
-                }
-            }
-        }
-
-        //绘制对应时间的降水图
-        if (isShowRain) {
-            if (rainDataMap.containsKey(startTime)) {
-                StrongStreamDto dto = rainDataMap.get(startTime);
-                if (!TextUtils.isEmpty(dto.imgPath)) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
-                    if (bitmap != null) {
-                        drawRainImg(bitmap, dto);
-                    }
-                }else {
-                    removeRainOverlay();
-                }
-            }
-        }
-
-        //绘制对应时间的雷暴云图
-        if (isShowLeibao) {
-            if (leibaoDataMap.containsKey(startTime)) {
-                StrongStreamDto dto = leibaoDataMap.get(startTime);
-                if (!TextUtils.isEmpty(dto.imgPath)) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
-                    if (bitmap != null) {
-                        drawLeibaoImg(bitmap, dto);
-                    }
-                }else {
-                    removeLeibaoOverlay();
-                }
-            }
-        }
-
-        //绘制对应时间的云顶高度图
-        if (isShowYunding) {
-            if (yundingDataMap.containsKey(startTime)) {
-                StrongStreamDto dto = yundingDataMap.get(startTime);
-                if (!TextUtils.isEmpty(dto.imgPath)) {
-                    Bitmap bitmap = BitmapFactory.decodeFile(dto.imgPath);
-                    if (bitmap != null) {
-                        drawYundingImg(bitmap, dto);
-                    }
-                }else {
-                    removeYundingOverlay();
-                }
-            }
-        }
-
+        }).start();
     }
 
     /**
@@ -1256,49 +1199,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * @param bitmap
      */
     private void drawRadarImg(final Bitmap bitmap) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (bitmap == null || !isShowRadar) {
-                    removeRadarOverlay();
-                    return;
-                }
-                BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
-                LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(new LatLng(53.56, 73.44))
-                        .include(new LatLng(10.15, 135.09))
-                        .build();
+        if (bitmap == null || !isShowRadar) {
+            removeRadarOverlay();
+            return;
+        }
+        BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(new LatLng(53.56, 73.44))
+                .include(new LatLng(10.15, 135.09))
+                .build();
 
-                if (radarOverlay == null) {
-                    radarOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
-                            .anchor(0.5f, 0.5f)
-                            .positionFromBounds(bounds)
-                            .image(fromView)
-                            .zIndex(1001)
-                            .transparency(0.25f));
-                } else {
-                    radarOverlay.setImage(null);
-                    radarOverlay.setPositionFromBounds(bounds);
-                    radarOverlay.setImage(fromView);
-                }
-                aMap.runOnDrawFrame();
-            }
-        }).start();
+        if (radarOverlay == null) {
+            radarOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
+                    .anchor(0.5f, 0.5f)
+                    .positionFromBounds(bounds)
+                    .image(fromView)
+                    .zIndex(1001)
+                    .transparency(0.25f));
+        } else {
+            radarOverlay.setImage(null);
+            radarOverlay.setPositionFromBounds(bounds);
+            radarOverlay.setImage(fromView);
+        }
+        aMap.runOnDrawFrame();
     }
 
     /**
      * 去除雷达图
      */
     private void removeRadarOverlay() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (radarOverlay != null) {
-                    radarOverlay.remove();
-                    radarOverlay = null;
-                }
-            }
-        }).start();
+        if (radarOverlay != null) {
+            radarOverlay.remove();
+            radarOverlay = null;
+        }
     }
 
     /**
@@ -1315,12 +1248,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * 清除强对流图层
      */
     private void removeScwLayer() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (String startTime : scwWindPolylineMap.keySet()) {
-                    if (scwWindPolylineMap.containsKey(startTime)) {
-                        List<Polyline> polylines = scwWindPolylineMap.get(startTime);
+        try {
+            for (String startTime : scwWindPolylineMap.keySet()) {
+                if (scwWindPolylineMap.containsKey(startTime)) {
+                    List<Polyline> polylines = scwWindPolylineMap.get(startTime);
+                    if (polylines != null) {
                         for (Polyline polyline : polylines) {
                             if (polyline != null) {
                                 polyline.remove();
@@ -1328,33 +1260,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                         }
                     }
                 }
-                scwWindPolylineMap.clear();
-
-                for (String startTime : scwRainPolylineMap.keySet()) {
-                    if (scwRainPolylineMap.containsKey(startTime)) {
-                        List<Polyline> polylines = scwRainPolylineMap.get(startTime);
-                        for (Polyline polyline : polylines) {
-                            if (polyline != null) {
-                                polyline.remove();
-                            }
-                        }
-                    }
-                }
-                scwRainPolylineMap.clear();
-
-                for (String startTime : scwHailPolylineMap.keySet()) {
-                    if (scwHailPolylineMap.containsKey(startTime)) {
-                        List<Polyline> polylines = scwHailPolylineMap.get(startTime);
-                        for (Polyline polyline : polylines) {
-                            if (polyline != null) {
-                                polyline.remove();
-                            }
-                        }
-                    }
-                }
-                scwHailPolylineMap.clear();
             }
-        }).start();
+            scwWindPolylineMap.clear();
+
+            for (String startTime : scwRainPolylineMap.keySet()) {
+                if (scwRainPolylineMap.containsKey(startTime)) {
+                    List<Polyline> polylines = scwRainPolylineMap.get(startTime);
+                    if (polylines != null) {
+                        for (Polyline polyline : polylines) {
+                            if (polyline != null) {
+                                polyline.remove();
+                            }
+                        }
+                    }
+                }
+            }
+            scwRainPolylineMap.clear();
+
+            for (String startTime : scwHailPolylineMap.keySet()) {
+                if (scwHailPolylineMap.containsKey(startTime)) {
+                    List<Polyline> polylines = scwHailPolylineMap.get(startTime);
+                    if (polylines != null) {
+                        for (Polyline polyline : polylines) {
+                            if (polyline != null) {
+                                polyline.remove();
+                            }
+                        }
+                    }
+                }
+            }
+            scwHailPolylineMap.clear();
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -1365,83 +1303,84 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         if (TextUtils.isEmpty(startTime)) {
             return;
         }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //绘制风图层
-                if (scwWindDataMap.containsKey(startTime)) {
-                    List<List<StrongStreamDto>> list = scwWindDataMap.get(startTime);
-                    List<Polyline> polylines = new ArrayList<>();
-                    for (List<StrongStreamDto> itemList : list) {
-                        PolylineOptions polylineOptions = new PolylineOptions();
-                        polylineOptions.color(0xff6727b0);
-                        polylineOptions.width(8);
-                        for (StrongStreamDto dto : itemList) {
-                            polylineOptions.add(new LatLng(dto.lat, dto.lng));
-                        }
-                        Polyline polyline = aMap.addPolyline(polylineOptions);
-                        polylines.add(polyline);
-                    }
-                    scwWindPolylineMap.put(startTime, polylines);
+        removeScwLayer();
+        //绘制风图层
+        if (scwWindDataMap.containsKey(startTime)) {
+            List<List<StrongStreamDto>> list = scwWindDataMap.get(startTime);
+            List<Polyline> polylines = new ArrayList<>();
+            for (List<StrongStreamDto> itemList : list) {
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.color(0xff6727b0);
+                polylineOptions.width(8);
+                for (StrongStreamDto dto : itemList) {
+                    polylineOptions.add(new LatLng(dto.lat, dto.lng));
                 }
-
-                //绘制降水图层
-                if (scwRainDataMap.containsKey(startTime)) {
-                    List<List<StrongStreamDto>> list = scwRainDataMap.get(startTime);
-                    List<Polyline> polylines = new ArrayList<>();
-                    for (List<StrongStreamDto> itemList : list) {
-                        PolylineOptions polylineOptions = new PolylineOptions();
-                        polylineOptions.color(0xff0070c6);
-                        polylineOptions.width(8);
-                        for (StrongStreamDto dto : itemList) {
-                            polylineOptions.add(new LatLng(dto.lat, dto.lng));
-                        }
-                        Polyline polyline = aMap.addPolyline(polylineOptions);
-                        polylines.add(polyline);
-                    }
-                    scwRainPolylineMap.put(startTime, polylines);
-                }
-
-                //绘制冰雹图层
-                if (scwHailDataMap.containsKey(startTime)) {
-                    List<List<StrongStreamDto>> list = scwHailDataMap.get(startTime);
-                    List<Polyline> polylines = new ArrayList<>();
-                    for (List<StrongStreamDto> itemList : list) {
-                        PolylineOptions polylineOptions = new PolylineOptions();
-                        polylineOptions.color(0xffc20052);
-                        polylineOptions.width(8);
-                        for (StrongStreamDto dto : itemList) {
-                            polylineOptions.add(new LatLng(dto.lat, dto.lng));
-                        }
-                        Polyline polyline = aMap.addPolyline(polylineOptions);
-                        polylines.add(polyline);
-                    }
-                    scwHailPolylineMap.put(startTime, polylines);
-                }
+                Polyline polyline = aMap.addPolyline(polylineOptions);
+                polylines.add(polyline);
             }
-        }).start();
+            scwWindPolylineMap.put(startTime, polylines);
+        }
+
+        //绘制降水图层
+        if (scwRainDataMap.containsKey(startTime)) {
+            List<List<StrongStreamDto>> list = scwRainDataMap.get(startTime);
+            List<Polyline> polylines = new ArrayList<>();
+            for (List<StrongStreamDto> itemList : list) {
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.color(0xff0070c6);
+                polylineOptions.width(8);
+                for (StrongStreamDto dto : itemList) {
+                    polylineOptions.add(new LatLng(dto.lat, dto.lng));
+                }
+                Polyline polyline = aMap.addPolyline(polylineOptions);
+                polylines.add(polyline);
+            }
+            scwRainPolylineMap.put(startTime, polylines);
+        }
+
+        //绘制冰雹图层
+        if (scwHailDataMap.containsKey(startTime)) {
+            List<List<StrongStreamDto>> list = scwHailDataMap.get(startTime);
+            List<Polyline> polylines = new ArrayList<>();
+            for (List<StrongStreamDto> itemList : list) {
+                PolylineOptions polylineOptions = new PolylineOptions();
+                polylineOptions.color(0xffc20052);
+                polylineOptions.width(8);
+                for (StrongStreamDto dto : itemList) {
+                    polylineOptions.add(new LatLng(dto.lat, dto.lng));
+                }
+                Polyline polyline = aMap.addPolyline(polylineOptions);
+                polylines.add(polyline);
+            }
+            scwHailPolylineMap.put(startTime, polylines);
+        }
     }
 
     /**
      * 去除闪电某个时间的雷电marker
      */
     private void removeThunderMarkers() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    for (Marker marker : thunderMarkers) {
-                        if (marker != null) {
-                            marker.remove();
-                        }
-                    }
-                    thunderMarkers.clear();
-                }catch (ConcurrentModificationException e) {
-                    e.printStackTrace();
+        try {
+            for (Marker marker : thunderMarkers) {
+                if (marker != null) {
+                    marker.remove();
                 }
             }
-        }).start();
+            thunderMarkers.clear();
+        } catch (ConcurrentModificationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 是否显示雷电markers
+     */
+    private void showOrHideThunderMarkers() {
+        for (Marker marker : thunderMarkers) {
+            if (marker != null) {
+                marker.setVisible(isShowThunderMarkers);
+            }
+        }
     }
 
     /**
@@ -1449,42 +1388,32 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * @param startTime
      */
     private void drawThunderMarkers(final String startTime) {
-        if (TextUtils.isEmpty(startTime)) {
+        if (TextUtils.isEmpty(startTime) || !isShowThunderMarkers) {
             return;
         }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (thunderDataMap.containsKey(startTime)) {
-                        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        List<StrongStreamDto> list = thunderDataMap.get(startTime);
-                        for (StrongStreamDto dto : list) {
-                            MarkerOptions options = new MarkerOptions();
-                            options.anchor(1.0f, 0.0f);
-                            options.position(new LatLng(dto.lat, dto.lng));
-                            View view = inflater.inflate(R.layout.shawn_thunder_marker, null);
-                            ImageView ivMarker = view.findViewById(R.id.ivMarker);
-                            if (TextUtils.equals(dto.type, "0")) {
-                                ivMarker.setImageResource(R.drawable.shawn_icon_thunder_diji);
-                            }else if (TextUtils.equals(dto.type, "1")){
-                                ivMarker.setImageResource(R.drawable.shawn_icon_thunder_luji);
-                            }
-                            options.icon(BitmapDescriptorFactory.fromView(view));
-                            Marker marker = aMap.addMarker(options);
-                            marker.setClickable(false);
-                            marker.setVisible(true);
-                            thunderMarkers.add(marker);
-                            expandMarker(marker);
-                        }
-                    }
-                }catch (ConcurrentModificationException e) {
-                    e.printStackTrace();
+        removeThunderMarkers();
+        if (thunderDataMap.containsKey(startTime)) {
+            LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            List<StrongStreamDto> list = thunderDataMap.get(startTime);
+            for (StrongStreamDto dto : list) {
+                MarkerOptions options = new MarkerOptions();
+                options.anchor(1.0f, 0.0f);
+                options.position(new LatLng(dto.lat, dto.lng));
+                View view = inflater.inflate(R.layout.shawn_thunder_marker, null);
+                ImageView ivMarker = view.findViewById(R.id.ivMarker);
+                if (TextUtils.equals(dto.type, "0")) {
+                    ivMarker.setImageResource(R.drawable.shawn_icon_thunder_diji);
+                }else if (TextUtils.equals(dto.type, "1")){
+                    ivMarker.setImageResource(R.drawable.shawn_icon_thunder_luji);
                 }
+                options.icon(BitmapDescriptorFactory.fromView(view));
+                Marker marker = aMap.addMarker(options);
+                marker.setClickable(false);
+                marker.setVisible(true);
+                thunderMarkers.add(marker);
+                expandMarker(marker);
             }
-        }).start();
-
+        }
     }
 
     /**
@@ -1512,7 +1441,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     }
 
     /**
-     * 获取h8云图数据
+     * 获取云顶低度数据
      */
     private void OkHttpCloud() {
         loadingView.setVisibility(View.VISIBLE);
@@ -1530,53 +1459,51 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                             return;
                         }
                         final String result = response.body().string();
+                        if (!TextUtils.isEmpty(result)) {
+                            try {
+                                cloudDataMap.clear();
+                                JSONObject obj = new JSONObject(result);
+                                LatLng leftLatLng = null,rightLatLng = null;
+                                if (!obj.isNull("rect")) {
+                                    JSONArray rect = obj.getJSONArray("rect");
+                                    leftLatLng = new LatLng(rect.getDouble(2), rect.getDouble(1));
+                                    rightLatLng = new LatLng(rect.getDouble(0), rect.getDouble(3));
+                                }
+                                if (!obj.isNull("l")) {
+                                    JSONArray array = obj.getJSONArray("l");
+                                    for (int i = 0; i < array.length(); i++) {
+                                        JSONObject itemObj = array.getJSONObject(i);
+                                        final StrongStreamDto dto = new StrongStreamDto();
+                                        dto.leftLatLng = leftLatLng;
+                                        dto.rightLatLng = rightLatLng;
+                                        if (!itemObj.isNull("l1")) {
+                                            try {
+                                                dto.startTime = sdf3.format(sdf2.parse(itemObj.getString("l1")));
+                                                if (!itemObj.isNull("l2")) {
+                                                    dto.imgUrl = itemObj.getString("l2");
+                                                    cloudDataMap.put(dto.startTime, dto);
+                                                }
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+
+                                    if (cloudDataMap.size() > 0) {
+                                        startDownloadCloudImgs();
+                                    }
+
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                if (!TextUtils.isEmpty(result)) {
-                                    try {
-                                        cloudDataMap.clear();
-                                        JSONObject obj = new JSONObject(result);
-                                        LatLng leftLatLng = null,rightLatLng = null;
-                                        if (!obj.isNull("rect")) {
-                                            JSONArray rect = obj.getJSONArray("rect");
-                                            leftLatLng = new LatLng(rect.getDouble(2), rect.getDouble(1));
-                                            rightLatLng = new LatLng(rect.getDouble(0), rect.getDouble(3));
-                                        }
-                                        if (!obj.isNull("l")) {
-                                            JSONArray array = obj.getJSONArray("l");
-                                            for (int i = 0; i < array.length(); i++) {
-                                                JSONObject itemObj = array.getJSONObject(i);
-                                                final StrongStreamDto dto = new StrongStreamDto();
-                                                dto.leftLatLng = leftLatLng;
-                                                dto.rightLatLng = rightLatLng;
-                                                if (!itemObj.isNull("l1")) {
-                                                    try {
-                                                        dto.startTime = sdf3.format(sdf2.parse(itemObj.getString("l1")));
-                                                        if (!itemObj.isNull("l2")) {
-                                                            dto.imgUrl = itemObj.getString("l2");
-                                                            cloudDataMap.put(dto.startTime, dto);
-                                                        }
-                                                    } catch (ParseException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                            }
-
-                                            if (cloudDataMap.size() > 0) {
-                                                startDownloadCloudImgs();
-                                            }
-
-                                            loadingView.setVisibility(View.GONE);
-
-                                        }
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
+                                loadingView.setVisibility(View.GONE);
                             }
                         });
-
                     }
                 });
             }
@@ -1627,49 +1554,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * @param bitmap
      */
     private void drawCloudImg(final Bitmap bitmap, final StrongStreamDto dto) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (bitmap == null || !isShowCloud) {
-                    removeCloudOverlay();
-                    return;
-                }
-                BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
-                LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(dto.leftLatLng)
-                        .include(dto.rightLatLng)
-                        .build();
+        if (bitmap == null || !isShowCloud) {
+            removeCloudOverlay();
+            return;
+        }
+        BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(dto.leftLatLng)
+                .include(dto.rightLatLng)
+                .build();
 
-                if (cloudOverlay == null) {
-                    cloudOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
-                            .anchor(0.5f, 0.5f)
-                            .positionFromBounds(bounds)
-                            .image(fromView)
-                            .zIndex(1000)
-                            .transparency(0.25f));
-                } else {
-                    cloudOverlay.setImage(null);
-                    cloudOverlay.setPositionFromBounds(bounds);
-                    cloudOverlay.setImage(fromView);
-                }
-                aMap.runOnDrawFrame();
-            }
-        }).start();
+        if (cloudOverlay == null) {
+            cloudOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
+                    .anchor(0.5f, 0.5f)
+                    .positionFromBounds(bounds)
+                    .image(fromView)
+                    .zIndex(1000)
+                    .transparency(0.25f));
+        } else {
+            cloudOverlay.setImage(null);
+            cloudOverlay.setPositionFromBounds(bounds);
+            cloudOverlay.setImage(fromView);
+        }
+        aMap.runOnDrawFrame();
     }
 
     /**
      * 去除云图
      */
     private void removeCloudOverlay() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (cloudOverlay != null) {
-                    cloudOverlay.remove();
-                    cloudOverlay = null;
-                }
-            }
-        }).start();
+        if (cloudOverlay != null) {
+            cloudOverlay.remove();
+            cloudOverlay = null;
+        }
     }
 
     /**
@@ -1773,18 +1690,17 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                         startDownloadRainImgs();
                                     }
 
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            loadingView.setVisibility(View.GONE);
-                                        }
-                                    });
-
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingView.setVisibility(View.GONE);
+                            }
+                        });
                     }
                 });
             }
@@ -1836,49 +1752,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * @param bitmap
      */
     private void drawRainImg(final Bitmap bitmap, final StrongStreamDto dto) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (bitmap == null || !isShowRain) {
-                    removeRainOverlay();
-                    return;
-                }
-                BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
-                LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(dto.leftLatLng)
-                        .include(dto.rightLatLng)
-                        .build();
+        if (bitmap == null || !isShowRain) {
+            removeRainOverlay();
+            return;
+        }
+        BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(dto.leftLatLng)
+                .include(dto.rightLatLng)
+                .build();
 
-                if (rainOverlay == null) {
-                    rainOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
-                            .anchor(0.5f, 0.5f)
-                            .positionFromBounds(bounds)
-                            .image(fromView)
-                            .zIndex(1002)
-                            .transparency(0.25f));
-                } else {
-                    rainOverlay.setImage(null);
-                    rainOverlay.setPositionFromBounds(bounds);
-                    rainOverlay.setImage(fromView);
-                }
-                aMap.runOnDrawFrame();
-            }
-        }).start();
+        if (rainOverlay == null) {
+            rainOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
+                    .anchor(0.5f, 0.5f)
+                    .positionFromBounds(bounds)
+                    .image(fromView)
+                    .zIndex(1002)
+                    .transparency(0.25f));
+        } else {
+            rainOverlay.setImage(null);
+            rainOverlay.setPositionFromBounds(bounds);
+            rainOverlay.setImage(fromView);
+        }
+        aMap.runOnDrawFrame();
     }
 
     /**
      * 去除降水图
      */
     private void removeRainOverlay() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (rainOverlay != null) {
-                    rainOverlay.remove();
-                    rainOverlay = null;
-                }
-            }
-        }).start();
+        if (rainOverlay != null) {
+            rainOverlay.remove();
+            rainOverlay = null;
+        }
     }
 
     /**
@@ -1934,18 +1840,17 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                         startDownloadLeibaoImgs();
                                     }
 
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            loadingView.setVisibility(View.GONE);
-                                        }
-                                    });
-
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingView.setVisibility(View.GONE);
+                            }
+                        });
                     }
                 });
             }
@@ -1996,49 +1901,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * @param bitmap
      */
     private void drawLeibaoImg(final Bitmap bitmap, final StrongStreamDto dto) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (bitmap == null || !isShowLeibao) {
-                    removeLeibaoOverlay();
-                    return;
-                }
-                BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
-                LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(dto.leftLatLng)
-                        .include(dto.rightLatLng)
-                        .build();
+        if (bitmap == null || !isShowLeibao) {
+            removeLeibaoOverlay();
+            return;
+        }
+        BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(dto.leftLatLng)
+                .include(dto.rightLatLng)
+                .build();
 
-                if (leibaoOverlay == null) {
-                    leibaoOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
-                            .anchor(0.5f, 0.5f)
-                            .positionFromBounds(bounds)
-                            .image(fromView)
-                            .zIndex(1000)
-                            .transparency(0.25f));
-                } else {
-                    leibaoOverlay.setImage(null);
-                    leibaoOverlay.setPositionFromBounds(bounds);
-                    leibaoOverlay.setImage(fromView);
-                }
-                aMap.runOnDrawFrame();
-            }
-        }).start();
+        if (leibaoOverlay == null) {
+            leibaoOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
+                    .anchor(0.5f, 0.5f)
+                    .positionFromBounds(bounds)
+                    .image(fromView)
+                    .zIndex(1000)
+                    .transparency(0.25f));
+        } else {
+            leibaoOverlay.setImage(null);
+            leibaoOverlay.setPositionFromBounds(bounds);
+            leibaoOverlay.setImage(fromView);
+        }
+        aMap.runOnDrawFrame();
     }
 
     /**
      * 去除雷暴云图
      */
     private void removeLeibaoOverlay() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (leibaoOverlay != null) {
-                    leibaoOverlay.remove();
-                    leibaoOverlay = null;
-                }
-            }
-        }).start();
+        if (leibaoOverlay != null) {
+            leibaoOverlay.remove();
+            leibaoOverlay = null;
+        }
     }
 
     /**
@@ -2094,18 +1989,17 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                         startDownloadYundingImgs();
                                     }
 
-                                    getActivity().runOnUiThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            loadingView.setVisibility(View.GONE);
-                                        }
-                                    });
-
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingView.setVisibility(View.GONE);
+                            }
+                        });
                     }
                 });
             }
@@ -2156,49 +2050,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
      * @param bitmap
      */
     private void drawYundingImg(final Bitmap bitmap, final StrongStreamDto dto) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (bitmap == null || !isShowYunding) {
-                    removeYundingOverlay();
-                    return;
-                }
-                BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
-                LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(dto.leftLatLng)
-                        .include(dto.rightLatLng)
-                        .build();
+        if (bitmap == null || !isShowYunding) {
+            removeYundingOverlay();
+            return;
+        }
+        BitmapDescriptor fromView = BitmapDescriptorFactory.fromBitmap(bitmap);
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(dto.leftLatLng)
+                .include(dto.rightLatLng)
+                .build();
 
-                if (yundingOverlay == null) {
-                    yundingOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
-                            .anchor(0.5f, 0.5f)
-                            .positionFromBounds(bounds)
-                            .image(fromView)
-                            .zIndex(1000)
-                            .transparency(0.25f));
-                } else {
-                    yundingOverlay.setImage(null);
-                    yundingOverlay.setPositionFromBounds(bounds);
-                    yundingOverlay.setImage(fromView);
-                }
-                aMap.runOnDrawFrame();
-            }
-        }).start();
+        if (yundingOverlay == null) {
+            yundingOverlay = aMap.addGroundOverlay(new GroundOverlayOptions()
+                    .anchor(0.5f, 0.5f)
+                    .positionFromBounds(bounds)
+                    .image(fromView)
+                    .zIndex(1000)
+                    .transparency(0.25f));
+        } else {
+            yundingOverlay.setImage(null);
+            yundingOverlay.setPositionFromBounds(bounds);
+            yundingOverlay.setImage(fromView);
+        }
+        aMap.runOnDrawFrame();
     }
 
     /**
      * 去除云顶高度图
      */
     private void removeYundingOverlay() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (yundingOverlay != null) {
-                    yundingOverlay.remove();
-                    yundingOverlay = null;
-                }
-            }
-        }).start();
+        if (yundingOverlay != null) {
+            yundingOverlay.remove();
+            yundingOverlay = null;
+        }
     }
 
     /**
@@ -2414,6 +2298,39 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     }
 
     @Override
+    public void onMapClick(LatLng latLng) {
+        locationLatLng = latLng;
+        addLocationMarker();
+        searchAddrByLatLng(latLng.latitude, latLng.longitude);
+        OkHttpThunderForecast(locationLatLng.longitude, locationLatLng.latitude);
+        OkHttpGeo(locationLatLng.longitude, locationLatLng.latitude);
+    }
+
+    /**
+     * 通过经纬度获取地理位置信息
+     * @param lat
+     * @param lng
+     */
+    private void searchAddrByLatLng(double lat, double lng) {
+        //latLonPoint参数表示一个Latlng，第二参数表示范围多少米，GeocodeSearch.AMAP表示是国测局坐标系还是GPS原生坐标系
+        RegeocodeQuery query = new RegeocodeQuery(new LatLonPoint(lat, lng), 200, GeocodeSearch.AMAP);
+        geocoderSearch.getFromLocationAsyn(query);
+    }
+
+    @Override
+    public void onGeocodeSearched(GeocodeResult arg0, int arg1) {
+    }
+    @Override
+    public void onRegeocodeSearched(RegeocodeResult result, int rCode) {
+        if (rCode == AMapException.CODE_AMAP_SUCCESS) {
+            if (result != null && result.getRegeocodeAddress() != null && result.getRegeocodeAddress().getFormatAddress() != null) {
+                tvPosition.setText(result.getRegeocodeAddress().getCity()+" | "+result.getRegeocodeAddress().getDistrict());
+                tvStreet.setText(result.getRegeocodeAddress().getFormatAddress());
+            }
+        }
+    }
+
+    @Override
     public boolean onMarkerClick(Marker marker) {
         if (marker != null && marker != locationMarker) {
             if (TextUtils.equals(marker.getSnippet(), Petrol)) {//加油站省份
@@ -2515,26 +2432,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         mAnimator.start();
     }
 
-    private void clickRainChart() {
-        reChart.measure(0, 0);
-        int height = reChart.getMeasuredHeight();
-        isShowDetail = !isShowDetail;
-        if (isShowDetail) {
-            ivArrow.setImageResource(R.drawable.shawn_icon_animation_up);
-            hideOrShowListViewAnimator(reChart, 0, height);
-        }else {
-            ivArrow.setImageResource(R.drawable.shawn_icon_animation_down);
-            hideOrShowListViewAnimator(reChart, height, 0);
-        }
-    }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.reTop:
-            case R.id.ivArrow:
-                clickRainChart();
-                break;
             case R.id.ivThunderFar:
                 startActivity(new Intent(getActivity(), ThunderFarActivity.class));
                 break;
@@ -2550,6 +2450,17 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     aMap.animateCamera(CameraUpdateFactory.newLatLng(locationLatLng));
                 }
                 break;
+            case R.id.ivLg:
+                if (ivLegend.getVisibility() == View.VISIBLE) {
+                    ivLegend.setVisibility(View.GONE);
+                }else {
+                    ivLegend.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.llThunder:
+                isShowThunderMarkers = !isShowThunderMarkers;
+                showOrHideThunderMarkers();
+                break;
             case R.id.ivPlay:
                 if (radarThread != null) {
                     if (radarThread.getCurrentState() == RadarThread.STATE_NONE) {
@@ -2564,42 +2475,46 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     }
                 }
                 break;
-            case R.id.llRadar:
-            case R.id.ivMoreRadar:
+            case R.id.ll1:
+            case R.id.ivMore1:
                 isShowRadar = !isShowRadar;
                 if (isShowRadar) {
-                    ivRadar.setImageResource(R.drawable.shawn_icon_radaron);
-                    tvRadar.setTextColor(Color.WHITE);
-                    llRadar.setBackgroundResource(R.drawable.shawn_bg_corner_top_blue);
-                    ivMoreRadar.setImageResource(R.drawable.shawn_icon_more_radaron);
+                    iv1.setImageResource(R.drawable.shawn_icon_radaron);
+                    tv1.setTextColor(Color.WHITE);
+                    ll1.setBackgroundResource(R.drawable.shawn_bg_corner_top_blue);
+                    ivMore1.setImageResource(R.drawable.shawn_icon_more_radaron);
+                    ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_radar));
                     drawFirstRadarImg();
                 }else {
-                    ivRadar.setImageResource(R.drawable.shawn_icon_radar);
-                    tvRadar.setTextColor(getResources().getColor(R.color.text_color3));
-                    llRadar.setBackgroundColor(Color.TRANSPARENT);
-                    ivMoreRadar.setImageResource(R.drawable.shawn_icon_more_radar);
+                    iv1.setImageResource(R.drawable.shawn_icon_radar);
+                    tv1.setTextColor(getResources().getColor(R.color.text_color3));
+                    ll1.setBackgroundColor(Color.TRANSPARENT);
+                    ivMore1.setImageResource(R.drawable.shawn_icon_more_radar);
+                    ivLegend.setImageDrawable(null);
                     removeRadarOverlay();
                 }
                 break;
-            case R.id.llCloud:
-            case R.id.ivMoreCloud:
-                isShowCloud = !isShowCloud;
-                if (isShowCloud) {
-                    ivCloud.setImageResource(R.drawable.shawn_icon_cloudon);
-                    tvCloud.setTextColor(Color.WHITE);
-                    llCloud.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    ivMoreCloud.setImageResource(R.drawable.shawn_icon_more_cloudon);
-                    if (cloudDataMap.size() <= 0) {
-                        OkHttpCloud();
+            case R.id.ll2:
+            case R.id.ivMore2:
+                isShowRain = !isShowRain;
+                if (isShowRain) {
+                    iv2.setImageResource(R.drawable.shawn_icon_rainon);
+                    tv2.setTextColor(Color.WHITE);
+                    ll2.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    ivMore2.setImageResource(R.drawable.shawn_icon_more_rainon);
+                    ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_rain));
+                    if (rainDataMap.size() <= 0) {
+                        OkHttpRain();
                     }else {
-                        drawFirstCloudImg();
+                        drawFirstRainImg();
                     }
                 }else {
-                    ivCloud.setImageResource(R.drawable.shawn_icon_cloud);
-                    tvCloud.setTextColor(getResources().getColor(R.color.text_color3));
-                    llCloud.setBackgroundColor(Color.TRANSPARENT);
-                    ivMoreCloud.setImageResource(R.drawable.shawn_icon_more_cloud);
-                    removeCloudOverlay();
+                    iv2.setImageResource(R.drawable.shawn_icon_rain);
+                    tv2.setTextColor(getResources().getColor(R.color.text_color3));
+                    ll2.setBackgroundColor(Color.TRANSPARENT);
+                    ivMore2.setImageResource(R.drawable.shawn_icon_more_rain);
+                    ivLegend.setImageDrawable(null);
+                    removeRainOverlay();
                 }
                 break;
             case R.id.llMore:
@@ -2618,51 +2533,62 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     reMore.setVisibility(View.GONE);
                 }
                 break;
-            case R.id.ivMoreRain:
-                isShowRain = !isShowRain;
-                if (isShowRain) {
-                    ivMoreRain.setImageResource(R.drawable.shawn_icon_more_rainon);
-                    if (rainDataMap.size() <= 0) {
-                        OkHttpRain();
-                    }else {
-                        drawFirstRainImg();
-                    }
-                }else {
-                    ivMoreRain.setImageResource(R.drawable.shawn_icon_more_rain);
-                    removeRainOverlay();
-                }
-                break;
-            case R.id.ivMoreLb:
-                isShowLeibao = !isShowLeibao;
-                if (isShowLeibao) {
-                    ivMoreLb.setImageResource(R.drawable.shawn_icon_more_lbon);
-                    if (leibaoDataMap.size() <= 0) {
-                        OkHttpLeibao();
-                    }else {
-                        drawFirstLeibaoImg();
-                    }
-                }else {
-                    ivMoreLb.setImageResource(R.drawable.shawn_icon_more_lb);
-                    removeLeibaoOverlay();
-                }
-                break;
-            case R.id.ivMoreDqdc:
+            case R.id.ivMore3:
+//                isShowVisible = !isShowVisible;
+//                if (isShowVisible) {
+//                    ivMore3.setImageResource(R.drawable.shawn_icon_more_visibleon);
+//                }else {
+//                    ivMore3.setImageResource(R.drawable.shawn_icon_more_visible);
+//                }
                 Toast.makeText(getActivity(), "暂无数据，敬请期待！！！", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.ivMoreYdgd:
+            case R.id.ivMore4:
                 isShowYunding = !isShowYunding;
                 if (isShowYunding) {
-                    ivMoreYdgd.setImageResource(R.drawable.shawn_icon_more_ydgdon);
+                    ivMore4.setImageResource(R.drawable.shawn_icon_more_ydgdon);
+                    ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_yunding));
                     if (yundingDataMap.size() <= 0) {
                         OkHttpYunding();
                     }else {
                         drawFirstYundingImg();
                     }
                 }else {
-                    ivMoreYdgd.setImageResource(R.drawable.shawn_icon_more_ydgd);
+                    ivMore4.setImageResource(R.drawable.shawn_icon_more_ydgd);
+                    ivLegend.setImageDrawable(null);
                     removeYundingOverlay();
                 }
                 break;
+            case R.id.ivMore5:
+                isShowCloud = !isShowCloud;
+                if (isShowCloud) {
+                    ivMore5.setImageResource(R.drawable.shawn_icon_more_ydddon);
+                    ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_yunding));
+                    if (cloudDataMap.size() <= 0) {
+                        OkHttpCloud();
+                    }else {
+                        drawFirstCloudImg();
+                    }
+                }else {
+                    ivMore5.setImageResource(R.drawable.shawn_icon_more_yddd);
+                    ivLegend.setImageDrawable(null);
+                    removeCloudOverlay();
+                }
+                break;
+            case R.id.ivMore6:
+                isShowLeibao = !isShowLeibao;
+                if (isShowLeibao) {
+                    ivMore6.setImageResource(R.drawable.shawn_icon_more_lbon);
+                    if (leibaoDataMap.size() <= 0) {
+                        OkHttpLeibao();
+                    }else {
+                        drawFirstLeibaoImg();
+                    }
+                }else {
+                    ivMore6.setImageResource(R.drawable.shawn_icon_more_lb);
+                    removeLeibaoOverlay();
+                }
+                break;
+
 
                 //设置
             case R.id.ivSetting:
@@ -2767,11 +2693,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
             mapView.onResume();
         }
 
-        //判断是否为第一次加载onResume事件，如果不是更新数据
-        if (!isFirstResume) {
-            mapLoaded();
-        }
-        isFirstResume = false;
+        mapLoaded();
     }
 
     /**

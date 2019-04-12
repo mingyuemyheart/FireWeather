@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.cxwl.shawn.thunder.PDFActivity;
+import com.cxwl.shawn.thunder.ShawnPDFActivity;
 import com.cxwl.shawn.thunder.R;
 import com.cxwl.shawn.thunder.ShawnSurfaceViewActivity;
 import com.cxwl.shawn.thunder.adapter.PictureLibraryAdapter;
@@ -72,7 +72,7 @@ public class FragmentKepu1 extends Fragment {
                 if (!TextUtils.isEmpty(dto.dataUrl)) {
                     Intent intent;
                     if (dto.dataUrl.endsWith(".pdf") || dto.dataUrl.endsWith(".PDF")) {
-                        intent = new Intent(getActivity(), PDFActivity.class);
+                        intent = new Intent(getActivity(), ShawnPDFActivity.class);
                         intent.putExtra("title", dto.eventContent);
                         intent.putExtra("dataUrl", dto.dataUrl);
                         startActivity(intent);

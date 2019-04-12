@@ -17,7 +17,7 @@ import com.cxwl.shawn.thunder.util.DataCleanManager;
 /**
  * 系统设置
  */
-public class ShawnSettingActivity extends BaseActivity implements View.OnClickListener {
+public class ShawnSettingActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private Context mContext;
     private TextView tvCache;

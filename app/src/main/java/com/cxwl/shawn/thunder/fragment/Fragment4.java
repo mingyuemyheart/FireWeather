@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.cxwl.shawn.thunder.LoginActivity;
+import com.cxwl.shawn.thunder.ShawnLoginActivity;
 import com.cxwl.shawn.thunder.R;
 import com.cxwl.shawn.thunder.ShawnAboutActivity;
 import com.cxwl.shawn.thunder.ShawnCheckActivity;
@@ -89,7 +89,11 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     private void refreshUserInfo() {
         checkAuthority();
 
-        if (!TextUtils.isEmpty(MyApplication.USERNAME)) {
+        if (!TextUtils.isEmpty(MyApplication.NICKNAME)) {
+            tvUserName.setText(MyApplication.NICKNAME);
+            llCheck.setVisibility(View.VISIBLE);
+            llPublish.setVisibility(View.VISIBLE);
+        }else if (!TextUtils.isEmpty(MyApplication.USERNAME)) {
             tvUserName.setText(MyApplication.USERNAME);
             llCheck.setVisibility(View.VISIBLE);
             llPublish.setVisibility(View.VISIBLE);
@@ -98,6 +102,7 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
             llCheck.setVisibility(View.GONE);
             llPublish.setVisibility(View.GONE);
         }
+
     }
 
     @Override
@@ -105,7 +110,7 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.rePortrait:
                 if (TextUtils.isEmpty(MyApplication.USERNAME)) {//登录
-                    startActivityForResult(new Intent(getActivity(), LoginActivity.class), 1001);
+                    startActivityForResult(new Intent(getActivity(), ShawnLoginActivity.class), 1001);
                 }else {//个人信息
                     startActivityForResult(new Intent(getActivity(), ShawnPersonInfoActivity.class), 1001);
                 }

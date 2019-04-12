@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 事件类型
  */
-public class EventTypeActivity extends BaseActivity implements View.OnClickListener {
+public class EventTypeActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

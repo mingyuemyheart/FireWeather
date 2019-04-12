@@ -56,7 +56,6 @@ public class MyApplication extends Application {
 	public static String GROUPID = "";//用户组id
 	public static String UID = "";//用户id
 	public static String USERNAME = "";//手机号
-	public static String TOKEN = "";//token
 	public static String PHOTO = "";//头像地址
 	public static String NICKNAME = "";//昵称
 	public static String MAIL = "";//邮箱
@@ -68,7 +67,6 @@ public class MyApplication extends Application {
 		public static final String groupId = "groupId";
 		public static final String uid = "uid";
 		public static final String userName = "uName";
-		public static final String token = "token";
 		public static final String photo = "photo";
 		public static final String nickName = "nickName";
 		public static final String mail = "mail";
@@ -86,7 +84,6 @@ public class MyApplication extends Application {
 		editor.apply();
 		GROUPID = "";
 		UID = "";
-		TOKEN = "";
 		USERNAME = "";
 		NICKNAME = "";
 		PHOTO = "";
@@ -103,7 +100,6 @@ public class MyApplication extends Application {
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putString(UserInfo.groupId, GROUPID);
 		editor.putString(UserInfo.uid, UID);
-		editor.putString(UserInfo.token, TOKEN);
 		editor.putString(UserInfo.userName, USERNAME);
 		editor.putString(UserInfo.nickName, NICKNAME);
 		editor.putString(UserInfo.photo, PHOTO);
@@ -120,7 +116,6 @@ public class MyApplication extends Application {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
 		GROUPID = sharedPreferences.getString(UserInfo.groupId, "");
 		UID = sharedPreferences.getString(UserInfo.uid, "");
-		TOKEN = sharedPreferences.getString(UserInfo.token, "");
 		USERNAME = sharedPreferences.getString(UserInfo.userName, "");
 		NICKNAME = sharedPreferences.getString(UserInfo.nickName, "");
 		PHOTO = sharedPreferences.getString(UserInfo.photo, "");

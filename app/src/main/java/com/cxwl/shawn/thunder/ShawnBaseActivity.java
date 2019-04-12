@@ -3,7 +3,7 @@ package com.cxwl.shawn.thunder;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class BaseActivity extends Activity{
+public class ShawnBaseActivity extends Activity{
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

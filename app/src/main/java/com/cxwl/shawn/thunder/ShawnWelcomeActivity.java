@@ -8,7 +8,7 @@ import android.view.KeyEvent;
 /**
  * 闪屏页
  */
-public class WelcomeActivity extends BaseActivity{
+public class ShawnWelcomeActivity extends ShawnBaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +25,7 @@ public class WelcomeActivity extends BaseActivity{
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+				startActivity(new Intent(ShawnWelcomeActivity.this, ShawnMainActivity.class));
 				finish();
 			}
 		}, 2000);

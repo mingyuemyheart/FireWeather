@@ -40,7 +40,7 @@ import okhttp3.Response;
 /**
  * PDF文档
  */
-public class PDFActivity extends BaseActivity implements OnClickListener {
+public class ShawnPDFActivity extends ShawnBaseActivity implements OnClickListener {
 
 	private TextView tvPercent;
 	private PDFView pdfView;
@@ -193,7 +193,7 @@ public class PDFActivity extends BaseActivity implements OnClickListener {
 						if (file.exists()) {
 							pdfView.fromFile(file)
 									.defaultPage(0)
-									.scrollHandle(new DefaultScrollHandle(PDFActivity.this))
+									.scrollHandle(new DefaultScrollHandle(ShawnPDFActivity.this))
 									.load();
 						}
 					}
@@ -239,7 +239,7 @@ public class PDFActivity extends BaseActivity implements OnClickListener {
 				init();
 			}else {
 				String[] permissions = deniedList.toArray(new String[deniedList.size()]);//将list转成数组
-				ActivityCompat.requestPermissions(PDFActivity.this, permissions, AuthorityUtil.AUTHOR_MULTI);
+				ActivityCompat.requestPermissions(ShawnPDFActivity.this, permissions, AuthorityUtil.AUTHOR_MULTI);
 			}
 		}
 	}

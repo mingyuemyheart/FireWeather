@@ -27,7 +27,7 @@ import com.wang.avi.AVLoadingIndicatorView;
  * @author shawn_sun
  *
  */
-public class ShawnSurfaceViewActivity extends BaseActivity implements View.OnClickListener, SurfaceHolder.Callback, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
+public class ShawnSurfaceViewActivity extends ShawnBaseActivity implements View.OnClickListener, SurfaceHolder.Callback, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
 	private RelativeLayout reTitle;
 	private SurfaceView surfaceView = null;

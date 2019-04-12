@@ -11,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +27,7 @@ import com.cxwl.shawn.thunder.common.CONST;
 import com.cxwl.shawn.thunder.common.MyApplication;
 import com.cxwl.shawn.thunder.util.AuthorityUtil;
 import com.cxwl.shawn.thunder.util.GetPathFromUri4kitkat;
+import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.view.CircleImageView;
 
 import java.io.File;
@@ -46,11 +46,10 @@ import okhttp3.Response;
 /**
  * 修改个人信息
  */
-public class ShawnPersonInfoActivity extends BaseActivity implements OnClickListener {
+public class ShawnPersonInfoActivity extends ShawnBaseActivity implements OnClickListener {
 
 	private Context mContext = null;
-	private LinearLayout llBack,llPortrait,llNickName,llMail,llUnit;
-	private TextView tvNickName,tvMail,tvUnit;
+	private TextView tvNickName,tvMobile,tvUnit;
 	private CircleImageView ivPortrait;
 
 	@Override
@@ -65,20 +64,18 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 	 * 初始化控件
 	 */
 	private void initWidget() {
-		llBack = findViewById(R.id.llBack);
+		LinearLayout llBack = findViewById(R.id.llBack);
 		llBack.setOnClickListener(this);
 		TextView tvTitle = findViewById(R.id.tvTitle);
 		tvTitle.setText("个人信息");
-		llPortrait = findViewById(R.id.llPortrait);
+		LinearLayout llPortrait = findViewById(R.id.llPortrait);
 		llPortrait.setOnClickListener(this);
 		ivPortrait = findViewById(R.id.ivPortrait);
-		llNickName = findViewById(R.id.llNickName);
+		LinearLayout llNickName = findViewById(R.id.llNickName);
 		llNickName.setOnClickListener(this);
 		tvNickName = findViewById(R.id.tvNickName);
-		llMail = findViewById(R.id.llMail);
-		llMail.setOnClickListener(this);
-		tvMail = findViewById(R.id.tvMail);
-		llUnit = findViewById(R.id.llUnit);
+		tvMobile = findViewById(R.id.tvMobile);
+		LinearLayout llUnit = findViewById(R.id.llUnit);
 		llUnit.setOnClickListener(this);
 		tvUnit = findViewById(R.id.tvUnit);
 		TextView tvLogout = findViewById(R.id.tvLogout);
@@ -100,15 +97,15 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 	private void refreshUserinfo() {
 		getPortrait();
 
-//		if (!TextUtils.isEmpty(CONST.USERNAME)) {
-//			tvNickName.setText(CONST.USERNAME);
-//		}
-//		if (!TextUtils.isEmpty(CONST.MAIL)) {
-//			tvMail.setText(CONST.MAIL);
-//		}
-//		if (!TextUtils.isEmpty(CONST.UNIT)) {
-//			tvUnit.setText(CONST.UNIT);
-//		}
+		if (!TextUtils.isEmpty(MyApplication.NICKNAME)) {
+			tvNickName.setText(MyApplication.NICKNAME);
+		}
+		if (!TextUtils.isEmpty(MyApplication.USERNAME)) {
+			tvMobile.setText(MyApplication.USERNAME);
+		}
+		if (!TextUtils.isEmpty(MyApplication.UNIT)) {
+			tvUnit.setText(MyApplication.UNIT);
+		}
 
 	}
 
@@ -155,6 +152,22 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 		});
 	}
 
+	/**
+	 * 获取相册
+	 */
+	private void getAlbum() {
+		Intent intent = new Intent();
+		intent.setAction(Intent.ACTION_GET_CONTENT);
+		intent.setType("image/*");
+		intent.putExtra("crop", "false");
+		intent.putExtra("aspectX", 1);
+		intent.putExtra("aspectY", 1);
+		intent.putExtra("outputX", 150);
+		intent.putExtra("outputY", 150);
+		intent.putExtra("return-data", true);
+		startActivityForResult(intent, 0);
+	}
+
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -166,34 +179,27 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 	
 	@Override
 	public void onClick(View v) {
+		Intent intent;
 		switch (v.getId()) {
-		case R.id.llBack:
-			setResult(RESULT_OK);
-			finish();
-			break;
-		case R.id.llPortrait:
-			Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-			intent.setType("image/*");
-			startActivityForResult(intent, 1001);
-			break;
-//		case R.id.llNickName:
-//			Intent intent = new Intent(mContext, ModifyInfoActivity.class);
-//			intent.putExtra("title", "昵称");
-//			intent.putExtra("content", MyApplication.NICKNAME);
-//			startActivityForResult(intent, 1);
-//			break;
-//		case R.id.llMail:
-//			intent = new Intent(mContext, ModifyInfoActivity.class);
-//			intent.putExtra("title", "邮箱");
-//			intent.putExtra("content", MyApplication.MAIL);
-//			startActivityForResult(intent, 2);
-//			break;
-//		case R.id.llUnit:
-//			intent = new Intent(mContext, ModifyInfoActivity.class);
-//			intent.putExtra("title", "单位名称");
-//			intent.putExtra("content", MyApplication.UNIT);
-//			startActivityForResult(intent, 3);
-//			break;
+			case R.id.llBack:
+				setResult(RESULT_OK);
+				finish();
+				break;
+			case R.id.llPortrait:
+				checkStorageAuthority();
+				break;
+			case R.id.llNickName:
+				intent = new Intent(mContext, ShawnModifyInfoActivity.class);
+				intent.putExtra("title", "昵称");
+				intent.putExtra("content", MyApplication.NICKNAME);
+				startActivityForResult(intent, 1);
+				break;
+			case R.id.llUnit:
+				intent = new Intent(mContext, ShawnModifyInfoActivity.class);
+				intent.putExtra("title", "单位名称");
+				intent.putExtra("content", MyApplication.UNIT);
+				startActivityForResult(intent, 3);
+				break;
 			case R.id.tvLogout:
 				dialogLogout();
 				break;
@@ -208,7 +214,7 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == RESULT_OK) {
 			switch (requestCode) {
-			case 1001://手机相册返回
+			case 0://手机相册返回
 				if (data != null) {
 					Uri uri = data.getData();
 					String filePath = GetPathFromUri4kitkat.getPath(mContext, uri);
@@ -222,22 +228,16 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 					return;
 				}
 				break;
-
-//			case 1:
-//				if (!TextUtils.isEmpty(CONST.NICKNAME)) {
-//					tvNickName.setText(CONST.NICKNAME);
-//				}
-//				break;
-//			case 2:
-//				if (!TextUtils.isEmpty(CONST.MAIL)) {
-//					tvMail.setText(CONST.MAIL);
-//				}
-//				break;
-//			case 3:
-//				if (!TextUtils.isEmpty(CONST.UNIT)) {
-//					tvUnit.setText(CONST.UNIT);
-//				}
-//				break;
+			case 1:
+				if (!TextUtils.isEmpty(MyApplication.NICKNAME)) {
+					tvNickName.setText(MyApplication.NICKNAME);
+				}
+				break;
+			case 3:
+				if (!TextUtils.isEmpty(MyApplication.UNIT)) {
+					tvUnit.setText(MyApplication.UNIT);
+				}
+				break;
 
 			default:
 				break;
@@ -257,76 +257,107 @@ public class ShawnPersonInfoActivity extends BaseActivity implements OnClickList
 		if (!file.exists()) {
 			return;
 		}
-		Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+		final Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 		if (bitmap == null) {
 			return;
 		}
 		ivPortrait.setImageBitmap(bitmap);
-		try {
-			File files = new File(CONST.SDCARD_PATH);
-			if (!files.exists()) {
-				files.mkdirs();
-			}
 
-			FileOutputStream fos = new FileOutputStream(CONST.PORTRAIT_ADDR);
-			bitmap.compress(CompressFormat.JPEG, 50, fos);
-			if (!bitmap.isRecycled()) {
-				bitmap.recycle();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					File files = new File(CONST.SDCARD_PATH);
+					if (!files.exists()) {
+						files.mkdirs();
+					}
+					FileOutputStream fos = new FileOutputStream(CONST.PORTRAIT_ADDR);
+					bitmap.compress(CompressFormat.JPEG, 50, fos);
+					if (!bitmap.isRecycled()) {
+						bitmap.recycle();
+					}
+					if (new File(CONST.PORTRAIT_ADDR).exists()) {
+						OkHttpUploadPortrait();
+					}
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
+		}).start();
 
-//				if (new File(CONST.PORTRAIT_ADDR).exists()) {
-//					OkHttpUploadPortrait();
-//				}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**
-	 * 上传图片
+	 * 上传头像
 	 */
 	private void OkHttpUploadPortrait() {
-//		final String url = "http://easylive.tianqi.cn/Home/Login/registeredChange";
-//		File file = new File(CONST.PORTRAIT_ADDR);
-//		if (!file.exists() || TextUtils.isEmpty(MyApplication.UID)) {
-//			return;
-//		}
-//		MultipartBody.Builder builder = new MultipartBody.Builder();
-//		builder.addFormDataPart("id", MyApplication.UID);
-//		builder.addFormDataPart("headpic", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
-//		final RequestBody body = builder.build();
-//		new Thread(new Runnable() {
-//			@Override
-//			public void run() {
-//				OkHttpUtil.enqueue(new Request.Builder().post(body).url(url).build(), new Callback() {
-//					@Override
-//					public void onFailure(Call call, IOException e) {
-//						runOnUiThread(new Runnable() {
-//							@Override
-//							public void run() {
-//								Toast.makeText(mContext, "上传失败！", Toast.LENGTH_SHORT).show();
-//							}
-//						});
-//					}
-//
-//					@Override
-//					public void onResponse(Call call, Response response) throws IOException {
-//						if (!response.isSuccessful()) {
-//							return;
-//						}
-//						final String result = response.body().string();
-//						runOnUiThread(new Runnable() {
-//							@Override
-//							public void run() {
-//								if (!TextUtils.isEmpty(result)) {
-//									getPortrait();
-//								}
-//							}
-//						});
-//					}
-//				});
-//			}
-//		}).start();
+		final String url = "http://decision-admin.tianqi.cn/home/Lightlogin/light_update";
+		File file = new File(CONST.PORTRAIT_ADDR);
+		if (!file.exists() || TextUtils.isEmpty(MyApplication.UID)) {
+			return;
+		}
+		MultipartBody.Builder builder = new MultipartBody.Builder();
+		builder.addFormDataPart("id", MyApplication.UID);
+		builder.addFormDataPart("photo", file.getName(), RequestBody.create(MediaType.parse("image/*"), file));
+		final RequestBody body = builder.build();
+		OkHttpUtil.enqueue(new Request.Builder().post(body).url(url).build(), new Callback() {
+			@Override
+			public void onFailure(Call call, IOException e) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						Toast.makeText(mContext, "上传失败！", Toast.LENGTH_SHORT).show();
+					}
+				});
+			}
+
+			@Override
+			public void onResponse(Call call, Response response) throws IOException {
+				if (!response.isSuccessful()) {
+					return;
+				}
+				final String result = response.body().string();
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						if (!TextUtils.isEmpty(result)) {
+							getPortrait();
+						}
+					}
+				});
+			}
+		});
+	}
+
+	/**
+	 * 申请存储权限
+	 */
+	private void checkStorageAuthority() {
+		if (Build.VERSION.SDK_INT < 23) {
+			getAlbum();
+		}else {
+			if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+				ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, AuthorityUtil.AUTHOR_STORAGE);
+			}else {
+				getAlbum();
+			}
+		}
+	}
+
+	@Override
+	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		switch (requestCode) {
+			case AuthorityUtil.AUTHOR_STORAGE:
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+					getAlbum();
+				}else {
+					if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+						AuthorityUtil.intentAuthorSetting(mContext, "\""+getString(R.string.app_name)+"\""+"需要使用存储权限，是否前往设置？");
+					}
+				}
+				break;
+		}
 	}
 	
 }

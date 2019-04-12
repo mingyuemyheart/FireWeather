@@ -34,7 +34,7 @@ import okhttp3.Response;
 /**
  * 消息
  */
-public class ShawnNewsActivity extends BaseActivity implements View.OnClickListener {
+public class ShawnNewsActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private Context mContext;
     private ShawnNewsAdapter adapter;

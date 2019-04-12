@@ -45,7 +45,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 /**
  * 图库
  */
-public class PictureLibraryActivity extends BaseActivity implements View.OnClickListener {
+public class PictureLibraryActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private int page = 1;
     private PictureLibraryAdapter picAdapter;

@@ -54,7 +54,7 @@ import okhttp3.Response;
 /**
  * 雷电上报
  */
-public class ThunderUploadActivity extends BaseActivity implements View.OnClickListener {
+public class ThunderUploadActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private Context mContext;
     private LinearLayout llAdd;

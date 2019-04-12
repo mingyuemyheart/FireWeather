@@ -3,13 +3,10 @@ package com.cxwl.shawn.thunder;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.cxwl.shawn.thunder.util.CommonUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,7 +15,7 @@ import java.util.Locale;
 /**
  * 雷电有多远
  */
-public class ThunderFarActivity extends BaseActivity implements View.OnClickListener {
+public class ThunderFarActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private TextView tvLook,tvSound,tvLine1,tvLine2,tvThunderLevel1,tvThunderLevel2,tvThunderLevel3,tvThunderLevel4,tvThunderLevel5;
     private ImageView ivThunderClick;

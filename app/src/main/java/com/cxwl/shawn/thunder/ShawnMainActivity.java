@@ -32,7 +32,7 @@ import com.cxwl.shawn.thunder.view.MainViewPager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity {
+public class ShawnMainActivity extends ShawnBaseActivity {
 
     private Context mContext;
     private MainViewPager viewPager;
@@ -263,7 +263,7 @@ public class MainActivity extends BaseActivity {
                 init();
             }else {
                 String[] permissions = AuthorityUtil.deniedList.toArray(new String[AuthorityUtil.deniedList.size()]);//将list转成数组
-                ActivityCompat.requestPermissions(MainActivity.this, permissions, AuthorityUtil.AUTHOR_MULTI);
+                ActivityCompat.requestPermissions(ShawnMainActivity.this, permissions, AuthorityUtil.AUTHOR_MULTI);
             }
         }
     }
