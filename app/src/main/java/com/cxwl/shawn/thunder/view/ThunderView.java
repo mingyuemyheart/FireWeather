@@ -146,7 +146,6 @@ public class ThunderView extends View {
 		lineP.setColor(0xffd7d8d8);
 		lineP.setStyle(Style.STROKE);
 		textP.setColor(getResources().getColor(R.color.text_color2));
-		textP.setTextSize(CommonUtil.dip2px(mContext, 10));
 		for (int i = 0; i < size; i++) {
 			StrongStreamDto dto = dataList.get(i);
 
@@ -158,12 +157,23 @@ public class ThunderView extends View {
 			canvas.drawPath(linePath, lineP);
 
 			//绘制时间
-			float tempWidth = textP.measureText(dto.thunderTime);
 			if (TextUtils.equals(type, "tendays")) {
-				if (i % 2 == 0) {
-					canvas.drawText(dto.thunderTime, dto.x-tempWidth/2, h-CommonUtil.dip2px(mContext, 5), textP);
+				textP.setTextSize(CommonUtil.dip2px(mContext, 8));
+				float tempWidth1 = textP.measureText((i/3+1)+"");
+				canvas.drawText((i/3+1)+"", dto.x-tempWidth1/2, h-CommonUtil.dip2px(mContext, 10), textP);
+				if (i % 3 == 0) {
+					float tempWidth2 = textP.measureText("上");
+					canvas.drawText("上", dto.x-tempWidth2/2, h-CommonUtil.dip2px(mContext, 2), textP);
+				}else if (i % 3 == 1) {
+					float tempWidth2 = textP.measureText("中");
+					canvas.drawText("中", dto.x-tempWidth2/2, h-CommonUtil.dip2px(mContext, 2), textP);
+				}else if (i % 3 == 2) {
+					float tempWidth2 = textP.measureText("下");
+					canvas.drawText("下", dto.x-tempWidth2/2, h-CommonUtil.dip2px(mContext, 2), textP);
 				}
 			}else {
+				textP.setTextSize(CommonUtil.dip2px(mContext, 10));
+				float tempWidth = textP.measureText(dto.thunderTime);
 				canvas.drawText(dto.thunderTime, dto.x-tempWidth/2, h-CommonUtil.dip2px(mContext, 5), textP);
 			}
 		}
@@ -190,7 +200,7 @@ public class ThunderView extends View {
 		}
 
 		//绘制曲线
-		lineP.setStrokeWidth(CommonUtil.dip2px(mContext, 2));
+		lineP.setStrokeWidth(CommonUtil.dip2px(mContext, 1));
 		lineP.setColor(0xff274AB2);
 		lineP.setStyle(Style.STROKE);
 		for (int i = 0; i < size-1; i++) {
@@ -203,6 +213,24 @@ public class ThunderView extends View {
 			linePath.moveTo(x1, y1);
 			linePath.lineTo(x2, y2);
 			canvas.drawPath(linePath, lineP);
+		}
+
+		textP.setColor(getResources().getColor(R.color.text_color3));
+		textP.setTextSize(CommonUtil.dip2px(mContext, 10));
+		for (int i = 0; i < size; i++) {
+			StrongStreamDto dto = dataList.get(i);
+
+			if (dto.thunderCount > 0) {
+				canvas.drawCircle(dto.x, dto.y, (int)CommonUtil.dip2px(mContext, 1), lineP);
+
+				//绘制次数
+				float countWidth = textP.measureText(dto.thunderCount+"");
+				if (dto.thunderCount < (maxValue+minValue)/2) {
+					canvas.drawText(dto.thunderCount+"", dto.x-countWidth/2, dto.y-CommonUtil.dip2px(mContext, 5), textP);
+				}else {
+					canvas.drawText(dto.thunderCount+"", dto.x-countWidth/2, dto.y+CommonUtil.dip2px(mContext, 15), textP);
+				}
+			}
 		}
 		
 	}

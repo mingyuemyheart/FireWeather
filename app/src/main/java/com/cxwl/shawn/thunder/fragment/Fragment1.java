@@ -2,6 +2,7 @@ package com.cxwl.shawn.thunder.fragment;
 
 import android.animation.IntEvaluator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
@@ -64,6 +65,7 @@ import com.cxwl.shawn.thunder.manager.RadarManager;
 import com.cxwl.shawn.thunder.manager.RainManager;
 import com.cxwl.shawn.thunder.manager.YdgdManager;
 import com.cxwl.shawn.thunder.util.CommonUtil;
+import com.cxwl.shawn.thunder.util.DataCleanManager;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.util.SecretUrlUtil;
 import com.cxwl.shawn.thunder.util.WeatherUtil;
@@ -2302,8 +2304,8 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         locationLatLng = latLng;
         addLocationMarker();
         searchAddrByLatLng(latLng.latitude, latLng.longitude);
-        OkHttpThunderForecast(locationLatLng.longitude, locationLatLng.latitude);
-        OkHttpGeo(locationLatLng.longitude, locationLatLng.latitude);
+        OkHttpThunderForecast(latLng.longitude, latLng.latitude);
+        OkHttpGeo(latLng.longitude, latLng.latitude);
     }
 
     /**
@@ -2406,30 +2408,49 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     }
 
     /**
-     * 隐藏或显示ListView的动画
+     * 显示网络
+     * @param dataType 雷达1、降水2、低能见度3、云顶高度4、云顶低度5、雷暴云图6
      */
-    public void hideOrShowListViewAnimator(final View view, final int startValue,final int endValue){
-        //1.设置属性的初始值和结束值
-        ValueAnimator mAnimator = ValueAnimator.ofInt(0,100);
-        //2.为目标对象的属性变化设置监听器
-        mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    private void dialogNetwork(final int dataType) {
+        LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.shawn_dialog_cache, null);
+        TextView tvContent = view.findViewById(R.id.tvContent);
+        TextView tvNegtive = view.findViewById(R.id.tvNegtive);
+        TextView tvPositive = view.findViewById(R.id.tvPositive);
+
+        final Dialog dialog = new Dialog(getActivity(), R.style.CustomProgressDialog);
+        dialog.setContentView(view);
+        dialog.show();
+
+        tvContent.setText("当前为非wifi环境，是否继续");
+        tvNegtive.setText("取消");
+        tvPositive.setText("继续");
+        tvNegtive.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                int animatorValue = (Integer) animation.getAnimatedValue();
-                float fraction = animatorValue/100f;
-                IntEvaluator mEvaluator = new IntEvaluator();
-                //3.使用IntEvaluator计算属性值并赋值给ListView的高
-                view.getLayoutParams().height = mEvaluator.evaluate(fraction, startValue, endValue);
-                view.requestLayout();
+            public void onClick(View arg0) {
+                dialog.dismiss();
             }
         });
-        //4.为ValueAnimator设置LinearInterpolator
-        mAnimator.setInterpolator(new LinearInterpolator());
-        //5.设置动画的持续时间
-        mAnimator.setDuration(200);
-        //6.为ValueAnimator设置目标对象并开始执行动画
-        mAnimator.setTarget(view);
-        mAnimator.start();
+
+        tvPositive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                dialog.dismiss();
+                if (dataType == 1) {
+
+                }else if (dataType == 2) {
+                    OkHttpRain();
+                }else if (dataType == 3) {
+
+                }else if (dataType == 4) {
+                    OkHttpYunding();
+                }else if (dataType == 5) {
+                    OkHttpCloud();
+                }else if (dataType == 6) {
+                    OkHttpLeibao();
+                }
+            }
+        });
     }
 
     @Override
@@ -2445,10 +2466,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                 startActivity(new Intent(getActivity(), PictureLibraryActivity.class));
                 break;
             case R.id.ivLocation:
-                if (locationLatLng != null) {
-                    addLocationMarker();
-                    aMap.animateCamera(CameraUpdateFactory.newLatLng(locationLatLng));
-                }
+                mapLoaded();
                 break;
             case R.id.ivLg:
                 if (ivLegend.getVisibility() == View.VISIBLE) {
@@ -2504,7 +2522,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     ivMore2.setImageResource(R.drawable.shawn_icon_more_rainon);
                     ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_rain));
                     if (rainDataMap.size() <= 0) {
-                        OkHttpRain();
+                        if (CommonUtil.getConnectedType(getActivity()) == 1) {
+                            OkHttpRain();
+                        }else {
+                            dialogNetwork(2);
+                        }
                     }else {
                         drawFirstRainImg();
                     }
@@ -2548,7 +2570,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     ivMore4.setImageResource(R.drawable.shawn_icon_more_ydgdon);
                     ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_yunding));
                     if (yundingDataMap.size() <= 0) {
-                        OkHttpYunding();
+                        if (CommonUtil.getConnectedType(getActivity()) == 1) {
+                            OkHttpYunding();
+                        }else {
+                            dialogNetwork(4);
+                        }
                     }else {
                         drawFirstYundingImg();
                     }
@@ -2564,7 +2590,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                     ivMore5.setImageResource(R.drawable.shawn_icon_more_ydddon);
                     ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_yunding));
                     if (cloudDataMap.size() <= 0) {
-                        OkHttpCloud();
+                        if (CommonUtil.getConnectedType(getActivity()) == 1) {
+                            OkHttpCloud();
+                        }else {
+                            dialogNetwork(5);
+                        }
                     }else {
                         drawFirstCloudImg();
                     }
@@ -2579,7 +2609,11 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                 if (isShowLeibao) {
                     ivMore6.setImageResource(R.drawable.shawn_icon_more_lbon);
                     if (leibaoDataMap.size() <= 0) {
-                        OkHttpLeibao();
+                        if (CommonUtil.getConnectedType(getActivity()) == 1) {
+                            OkHttpLeibao();
+                        }else {
+                            dialogNetwork(6);
+                        }
                     }else {
                         drawFirstLeibaoImg();
                     }
