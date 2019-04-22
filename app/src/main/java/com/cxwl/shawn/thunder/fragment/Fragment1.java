@@ -1,7 +1,5 @@
 package com.cxwl.shawn.thunder.fragment;
 
-import android.animation.IntEvaluator;
-import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
@@ -9,7 +7,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -65,7 +62,6 @@ import com.cxwl.shawn.thunder.manager.RadarManager;
 import com.cxwl.shawn.thunder.manager.RainManager;
 import com.cxwl.shawn.thunder.manager.YdgdManager;
 import com.cxwl.shawn.thunder.util.CommonUtil;
-import com.cxwl.shawn.thunder.util.DataCleanManager;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.util.SecretUrlUtil;
 import com.cxwl.shawn.thunder.util.WeatherUtil;
@@ -599,19 +595,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                             JSONObject itemObj = array.getJSONObject(i);
                                             if (!itemObj.isNull("startTime")) {
                                                 final String startTime = itemObj.getString("startTime");
-                                                if (i == array.length()-1) {
-                                                    getActivity().runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                tvTime.setText(sdf4.format(sdf3.parse(startTime))+"发布");
-                                                            } catch (ParseException e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    });
-                                                }
-
                                                 if (!itemObj.isNull("data")) {
                                                     JSONArray dataArray = itemObj.getJSONArray("data");
                                                     List<StrongStreamDto> list = new ArrayList<>();
@@ -627,9 +610,26 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                         if (!dataObj.isNull("type")) {
                                                             dto.type = dataObj.getString("type");
                                                         }
+                                                        if (!dataObj.isNull("num")) {
+                                                            dto.num = dataObj.getString("num");
+                                                        }
                                                         list.add(dto);
                                                     }
                                                     thunderDataMap.put(startTime, list);
+                                                }
+
+                                                if (i == array.length()-1) {
+                                                    drawMutiElement(startTime);
+                                                    getActivity().runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try {
+                                                                tvTime.setText(sdf4.format(sdf3.parse(startTime))+"发布");
+                                                            } catch (ParseException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
                                                 }
                                             }
                                         }
@@ -655,6 +655,9 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                         }
                                                         if (!dataObj.isNull("type")) {
                                                             dto.type = dataObj.getString("type");
+                                                        }
+                                                        if (!dataObj.isNull("num")) {
+                                                            dto.num = dataObj.getString("num");
                                                         }
                                                         list.add(dto);
                                                     }
@@ -833,7 +836,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                 if (i == array.length()-1) {
                                                     dto.isCurrentTime = true;
                                                     dto.tag = dto.startTime;
-                                                    drawMutiElement(dto.startTime);
+//                                                    drawMutiElement(dto.startTime);
                                                 }
                                                 radarDataMap.put(dto.startTime, dto);
                                                 radarList.add(dto);
@@ -1399,6 +1402,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
             List<StrongStreamDto> list = thunderDataMap.get(startTime);
             for (StrongStreamDto dto : list) {
                 MarkerOptions options = new MarkerOptions();
+                options.title(dto.num+"个雷电");
                 options.anchor(1.0f, 0.0f);
                 options.position(new LatLng(dto.lat, dto.lng));
                 View view = inflater.inflate(R.layout.shawn_thunder_marker, null);
@@ -1410,7 +1414,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                 }
                 options.icon(BitmapDescriptorFactory.fromView(view));
                 Marker marker = aMap.addMarker(options);
-                marker.setClickable(false);
                 marker.setVisible(true);
                 thunderMarkers.add(marker);
                 expandMarker(marker);
@@ -2375,12 +2378,18 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         TextView tvName = view.findViewById(R.id.tvName);
         TextView tvInfo = view.findViewById(R.id.tvInfo);
         if (!TextUtils.isEmpty(marker.getTitle())) {
-            String[] title = marker.getTitle().split("\\|");
-            if (!TextUtils.isEmpty(title[0])) {
-                tvName.setText(title[0]);
-            }
-            if (!TextUtils.isEmpty(title[1])) {
-                tvInfo.setText(title[1]);
+            if (marker.getTitle().contains("|")) {
+                String[] title = marker.getTitle().split("\\|");
+                if (!TextUtils.isEmpty(title[0])) {
+                    tvName.setText(title[0]);
+                }
+                if (!TextUtils.isEmpty(title[1])) {
+                    tvInfo.setText(title[1]);
+                    tvInfo.setVisibility(View.VISIBLE);
+                }
+            }else {
+                tvName.setText(marker.getTitle());
+                tvInfo.setVisibility(View.GONE);
             }
         }
         return view;

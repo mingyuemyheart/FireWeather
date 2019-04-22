@@ -12,6 +12,7 @@ public class StrongStreamDto implements Parcelable {
 
     public String imgUrl;//
     public String imgPath;// 下载到本地存放的路径
+    public String num;//雷电次数
     public String type;//0代表 地基 1代表路基
     public String startTime;
     public double lat;
@@ -56,6 +57,7 @@ public class StrongStreamDto implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.imgUrl);
         dest.writeString(this.imgPath);
+        dest.writeString(this.num);
         dest.writeString(this.type);
         dest.writeString(this.startTime);
         dest.writeDouble(this.lat);
@@ -86,6 +88,7 @@ public class StrongStreamDto implements Parcelable {
     protected StrongStreamDto(Parcel in) {
         this.imgUrl = in.readString();
         this.imgPath = in.readString();
+        this.num = in.readString();
         this.type = in.readString();
         this.startTime = in.readString();
         this.lat = in.readDouble();
