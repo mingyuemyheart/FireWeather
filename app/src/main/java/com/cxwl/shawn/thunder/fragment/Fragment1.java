@@ -51,10 +51,10 @@ import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
-import com.cxwl.shawn.thunder.PictureLibraryActivity;
+import com.cxwl.shawn.thunder.ShawnPictureLibraryActivity;
 import com.cxwl.shawn.thunder.R;
-import com.cxwl.shawn.thunder.ThunderFarActivity;
-import com.cxwl.shawn.thunder.ThunderUploadActivity;
+import com.cxwl.shawn.thunder.ShawnThunderFarActivity;
+import com.cxwl.shawn.thunder.ShawnThunderUploadActivity;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
 import com.cxwl.shawn.thunder.manager.CloudManager;
 import com.cxwl.shawn.thunder.manager.LeibaoManager;
@@ -2466,13 +2466,13 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ivThunderFar:
-                startActivity(new Intent(getActivity(), ThunderFarActivity.class));
+                startActivity(new Intent(getActivity(), ShawnThunderFarActivity.class));
                 break;
             case R.id.ivCamera:
-                startActivity(new Intent(getActivity(), ThunderUploadActivity.class));
+                startActivity(new Intent(getActivity(), ShawnThunderUploadActivity.class));
                 break;
             case R.id.ivPicture:
-                startActivity(new Intent(getActivity(), PictureLibraryActivity.class));
+                startActivity(new Intent(getActivity(), ShawnPictureLibraryActivity.class));
                 break;
             case R.id.ivLocation:
                 mapLoaded();

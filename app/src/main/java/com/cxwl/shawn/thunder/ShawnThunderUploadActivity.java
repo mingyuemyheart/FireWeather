@@ -54,7 +54,7 @@ import okhttp3.Response;
 /**
  * 雷电上报
  */
-public class ThunderUploadActivity extends ShawnBaseActivity implements View.OnClickListener {
+public class ShawnThunderUploadActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private Context mContext;
     private LinearLayout llAdd;
@@ -190,9 +190,7 @@ public class ThunderUploadActivity extends ShawnBaseActivity implements View.OnC
                 OkHttpUtil.enqueue(new Request.Builder().post(body).url(url).build(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-
                     }
-
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (!response.isSuccessful()) {
@@ -236,7 +234,7 @@ public class ThunderUploadActivity extends ShawnBaseActivity implements View.OnC
                 startActivityForResult(intent, 1001);
                 break;
             case R.id.llEventType:
-                startActivityForResult(new Intent(mContext, EventTypeActivity.class), 1002);
+                startActivityForResult(new Intent(mContext, ShawnEventTypeActivity.class), 1002);
                 break;
             case R.id.tvControl:
                 if (checkCondition()) {
@@ -315,7 +313,7 @@ public class ThunderUploadActivity extends ShawnBaseActivity implements View.OnC
                 initWidget();
             }else {
                 String[] permissions = deniedList.toArray(new String[deniedList.size()]);//将list转成数组
-                ActivityCompat.requestPermissions(ThunderUploadActivity.this, permissions, AuthorityUtil.AUTHOR_MULTI);
+                ActivityCompat.requestPermissions(ShawnThunderUploadActivity.this, permissions, AuthorityUtil.AUTHOR_MULTI);
             }
         }
     }

@@ -22,7 +22,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cxwl.shawn.thunder.R;
-import com.cxwl.shawn.thunder.adapter.PictureLibraryAdapter;
+import com.cxwl.shawn.thunder.adapter.ShawnPictureLibraryAdapter;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.view.PhotoView;
@@ -49,7 +49,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 public class FragmentKepu2 extends Fragment implements View.OnClickListener {
 
     private View view;
-    private PictureLibraryAdapter picAdapter;
+    private ShawnPictureLibraryAdapter picAdapter;
     private List<StrongStreamDto> picList = new ArrayList<>();
     private ViewPager mViewPager;
     private RelativeLayout reViewPager;
@@ -82,7 +82,7 @@ public class FragmentKepu2 extends Fragment implements View.OnClickListener {
 
     private void initGridView() {
         GridView gridView = view.findViewById(R.id.gridView);
-        picAdapter = new PictureLibraryAdapter(getActivity(), picList);
+        picAdapter = new ShawnPictureLibraryAdapter(getActivity(), picList);
         gridView.setAdapter(picAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.cxwl.shawn.thunder.adapter.EventTypeAdapter;
+import com.cxwl.shawn.thunder.adapter.ShawnEventTypeAdapter;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 事件类型
  */
-public class EventTypeActivity extends ShawnBaseActivity implements View.OnClickListener {
+public class ShawnEventTypeActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class EventTypeActivity extends ShawnBaseActivity implements View.OnClick
         list.add(dto);
 
         ListView listView = findViewById(R.id.listView);
-        EventTypeAdapter mAdapter = new EventTypeAdapter(this, list);
+        ShawnEventTypeAdapter mAdapter = new ShawnEventTypeAdapter(this, list);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

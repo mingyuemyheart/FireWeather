@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * 图库
  */
-public class PictureLibraryAdapter extends BaseAdapter {
+public class ShawnPictureLibraryAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
 	private List<StrongStreamDto> mArrayList;
@@ -31,7 +31,7 @@ public class PictureLibraryAdapter extends BaseAdapter {
 		TextView tvName;
 	}
 
-	public PictureLibraryAdapter(Context context, List<StrongStreamDto> mArrayList) {
+	public ShawnPictureLibraryAdapter(Context context, List<StrongStreamDto> mArrayList) {
 		this.mArrayList = mArrayList;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		

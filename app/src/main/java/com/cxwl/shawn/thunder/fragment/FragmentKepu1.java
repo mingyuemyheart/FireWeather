@@ -14,7 +14,7 @@ import android.widget.GridView;
 import com.cxwl.shawn.thunder.ShawnPDFActivity;
 import com.cxwl.shawn.thunder.R;
 import com.cxwl.shawn.thunder.ShawnSurfaceViewActivity;
-import com.cxwl.shawn.thunder.adapter.PictureLibraryAdapter;
+import com.cxwl.shawn.thunder.adapter.ShawnPictureLibraryAdapter;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.wang.avi.AVLoadingIndicatorView;
@@ -37,7 +37,7 @@ import okhttp3.Response;
  */
 public class FragmentKepu1 extends Fragment {
 
-    private PictureLibraryAdapter picAdapter;
+    private ShawnPictureLibraryAdapter picAdapter;
     private List<StrongStreamDto> picList = new ArrayList<>();
     private AVLoadingIndicatorView loadingView;
 
@@ -63,7 +63,7 @@ public class FragmentKepu1 extends Fragment {
 
     private void initGridView(View view) {
         GridView gridView = view.findViewById(R.id.gridView);
-        picAdapter = new PictureLibraryAdapter(getActivity(), picList);
+        picAdapter = new ShawnPictureLibraryAdapter(getActivity(), picList);
         gridView.setAdapter(picAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

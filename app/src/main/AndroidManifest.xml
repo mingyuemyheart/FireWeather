@@ -51,16 +51,16 @@
         <activity android:name=".ShawnMainActivity"
             android:screenOrientation="portrait"/>
 
-        <activity android:name=".ThunderUploadActivity"
+        <activity android:name=".ShawnThunderUploadActivity"
                   android:screenOrientation="portrait"/>
 
-        <activity android:name=".EventTypeActivity"
+        <activity android:name=".ShawnEventTypeActivity"
                   android:screenOrientation="portrait"/>
 
-        <activity android:name=".PictureLibraryActivity"
+        <activity android:name=".ShawnPictureLibraryActivity"
                   android:screenOrientation="portrait"/>
 
-        <activity android:name=".ThunderFarActivity"
+        <activity android:name=".ShawnThunderFarActivity"
                   android:screenOrientation="portrait"/>
 
         <activity android:name=".ShawnPDFActivity"

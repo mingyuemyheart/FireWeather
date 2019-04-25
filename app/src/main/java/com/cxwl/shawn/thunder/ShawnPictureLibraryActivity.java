@@ -21,7 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.cxwl.shawn.thunder.adapter.PictureLibraryAdapter;
+import com.cxwl.shawn.thunder.adapter.ShawnPictureLibraryAdapter;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.view.PhotoView;
@@ -45,10 +45,10 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 /**
  * 图库
  */
-public class PictureLibraryActivity extends ShawnBaseActivity implements View.OnClickListener {
+public class ShawnPictureLibraryActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private int page = 1;
-    private PictureLibraryAdapter picAdapter;
+    private ShawnPictureLibraryAdapter picAdapter;
     private List<StrongStreamDto> picList = new ArrayList<>();
     private ViewPager mViewPager;
     private RelativeLayout reViewPager;
@@ -79,7 +79,7 @@ public class PictureLibraryActivity extends ShawnBaseActivity implements View.On
 
     private void initGridView() {
         GridView gridView = findViewById(R.id.gridView);
-        picAdapter = new PictureLibraryAdapter(this, picList);
+        picAdapter = new ShawnPictureLibraryAdapter(this, picList);
         gridView.setAdapter(picAdapter);
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

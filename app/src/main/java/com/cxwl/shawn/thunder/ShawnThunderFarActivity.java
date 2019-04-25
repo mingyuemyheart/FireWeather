@@ -15,7 +15,7 @@ import java.util.Locale;
 /**
  * 雷电有多远
  */
-public class ThunderFarActivity extends ShawnBaseActivity implements View.OnClickListener {
+public class ShawnThunderFarActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private TextView tvLook,tvSound,tvLine1,tvLine2,tvThunderLevel1,tvThunderLevel2,tvThunderLevel3,tvThunderLevel4,tvThunderLevel5;
     private ImageView ivThunderClick;

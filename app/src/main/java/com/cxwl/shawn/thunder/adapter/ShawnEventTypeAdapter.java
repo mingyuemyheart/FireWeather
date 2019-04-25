@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 事件类型
  */
-public class EventTypeAdapter extends BaseAdapter {
+public class ShawnEventTypeAdapter extends BaseAdapter {
 
 	private Context mContext;
 	private LayoutInflater mInflater;
@@ -26,7 +26,7 @@ public class EventTypeAdapter extends BaseAdapter {
 		TextView tvEventType;
 	}
 
-	public EventTypeAdapter(Context context, List<StrongStreamDto> mArrayList) {
+	public ShawnEventTypeAdapter(Context context, List<StrongStreamDto> mArrayList) {
 		mContext = context;
 		this.mArrayList = mArrayList;
 		mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
