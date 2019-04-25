@@ -52,11 +52,13 @@ public class ShawnCheckAdapter extends BaseAdapter {
 	
 	@Override
 	public int getViewTypeCount() {
+		// menu type count
 		return 3;
 	}
 	
 	@Override
 	public int getItemViewType(int position) {
+		// current menu type
 		StrongStreamDto data = mArrayList.get(position);
 		if (TextUtils.equals(data.status, "0")) {//未审核
 			return 0;
