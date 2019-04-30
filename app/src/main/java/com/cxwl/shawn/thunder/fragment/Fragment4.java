@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.cxwl.shawn.thunder.ShawnIntroActivity;
 import com.cxwl.shawn.thunder.ShawnLoginActivity;
 import com.cxwl.shawn.thunder.R;
 import com.cxwl.shawn.thunder.ShawnAboutActivity;
@@ -45,8 +46,7 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.shawn_fragment4, null);
-        return view;
+        return inflater.inflate(R.layout.shawn_fragment4, null);
     }
 
     @Override
@@ -72,6 +72,8 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
         llAbout.setOnClickListener(this);
         LinearLayout llSetting = view.findViewById(R.id.llSetting);
         llSetting.setOnClickListener(this);
+        LinearLayout llIntro = view.findViewById(R.id.llIntro);
+        llIntro.setOnClickListener(this);
 
         refreshUserInfo();
 
@@ -129,6 +131,9 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                 break;
             case R.id.llSetting:
                 startActivity(new Intent(getActivity(), ShawnSettingActivity.class));
+                break;
+            case R.id.llIntro:
+                startActivity(new Intent(getActivity(), ShawnIntroActivity.class));
                 break;
 
         }

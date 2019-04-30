@@ -96,6 +96,10 @@
             android:name=".ShawnModifyInfoActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name=".ShawnIntroActivity"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>
