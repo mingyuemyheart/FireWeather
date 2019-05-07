@@ -340,7 +340,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         mLocationClient.setLocationListener(new AMapLocationListener() {
             @Override
             public void onLocationChanged(AMapLocation aMapLocation) {
-                if (aMapLocation != null && aMapLocation.getErrorCode() == 0) {
+                if (aMapLocation != null && aMapLocation.getErrorCode() == AMapLocation.LOCATION_SUCCESS) {
                     locationComplete(aMapLocation.getCity(), aMapLocation.getDistrict(), aMapLocation.getStreet(),
                             aMapLocation.getStreetNum(), aMapLocation.getLatitude(), aMapLocation.getLongitude());
                 }else {
