@@ -127,6 +127,63 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/llLegendQdl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/llThunder"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/shawn_bg_corner_black"
+        android:gravity="center_vertical|center"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginEnd="3dp"
+            android:src="@drawable/shawn_bg_qdl_bb"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="冰雹"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="3dp"
+            android:src="@drawable/shawn_bg_qdl_lydf"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="雷雨大风"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+        <ImageView
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="3dp"
+            android:src="@drawable/shawn_bg_qdl_qjs"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="强降雨"
+            android:textColor="@color/white"
+            android:textSize="@dimen/level_5"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/llThunder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -155,7 +212,7 @@
         <ImageView
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:layout_marginStart="5dp"
+            android:layout_marginStart="10dp"
             android:src="@drawable/shawn_icon_thunder_diji"/>
 
         <TextView
@@ -199,7 +256,7 @@
         android:id="@+id/ivLg"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_above="@+id/llThunder"
+        android:layout_above="@+id/llLegendQdl"
         android:layout_marginStart="5dp"
         android:layout_marginBottom="5dp"
         android:src="@drawable/shawn_icon_legend"/>
@@ -208,7 +265,7 @@
         android:id="@+id/ivLegend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/llThunder"
+        android:layout_above="@+id/llLegendQdl"
         android:layout_marginBottom="5dp"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"

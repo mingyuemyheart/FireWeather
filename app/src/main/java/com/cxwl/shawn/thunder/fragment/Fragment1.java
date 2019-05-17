@@ -585,6 +585,90 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                             try {
                                 JSONObject object = new JSONObject(result);
 
+                                //闪电数据
+                                thunderDataMap.clear();
+                                if (!object.isNull("lightning")) {
+                                    JSONObject obj = object.getJSONObject("lightning");
+                                    if (!obj.isNull("observe")) {
+                                        JSONArray array = obj.getJSONArray("observe");
+                                        for (int i = 0; i < array.length(); i++) {
+                                            JSONObject itemObj = array.getJSONObject(i);
+                                            if (!itemObj.isNull("startTime")) {
+                                                final String startTime = itemObj.getString("startTime");
+                                                if (!itemObj.isNull("data")) {
+                                                    JSONArray dataArray = itemObj.getJSONArray("data");
+                                                    List<StrongStreamDto> list = new ArrayList<>();
+                                                    for (int j = 0; j < dataArray.length(); j++) {
+                                                        JSONObject dataObj = dataArray.getJSONObject(j);
+                                                        StrongStreamDto dto = new StrongStreamDto();
+                                                        if (!dataObj.isNull("lat")) {
+                                                            dto.lat = dataObj.getDouble("lat");
+                                                        }
+                                                        if (!dataObj.isNull("lon")) {
+                                                            dto.lng = dataObj.getDouble("lon");
+                                                        }
+                                                        if (!dataObj.isNull("type")) {
+                                                            dto.type = dataObj.getString("type");
+                                                        }
+                                                        if (!dataObj.isNull("num")) {
+                                                            dto.num = dataObj.getString("num");
+                                                        }
+                                                        list.add(dto);
+                                                    }
+                                                    thunderDataMap.put(startTime, list);
+                                                }
+
+                                                if (i == array.length()-1) {
+                                                    drawMutiElement(startTime);
+                                                    getActivity().runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            try {
+                                                                tvTime.setText(sdf4.format(sdf3.parse(startTime))+"发布");
+                                                            } catch (ParseException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    if (!obj.isNull("forecast")) {
+                                        JSONArray array = obj.getJSONArray("forecast");
+                                        for (int i = 0; i < array.length(); i++) {
+                                            JSONObject itemObj = array.getJSONObject(i);
+                                            if (!itemObj.isNull("startTime")) {
+                                                String startTime = itemObj.getString("startTime");
+                                                if (!itemObj.isNull("data")) {
+                                                    JSONArray dataArray = itemObj.getJSONArray("data");
+                                                    List<StrongStreamDto> list = new ArrayList<>();
+                                                    for (int j = 0; j < dataArray.length(); j++) {
+                                                        JSONObject dataObj = dataArray.getJSONObject(j);
+                                                        StrongStreamDto dto = new StrongStreamDto();
+                                                        if (!dataObj.isNull("lat")) {
+                                                            dto.lat = dataObj.getDouble("lat");
+                                                        }
+                                                        if (!dataObj.isNull("lon")) {
+                                                            dto.lng = dataObj.getDouble("lon");
+                                                        }
+                                                        if (!dataObj.isNull("type")) {
+                                                            dto.type = dataObj.getString("type");
+                                                        }
+                                                        if (!dataObj.isNull("num")) {
+                                                            dto.num = dataObj.getString("num");
+                                                        }
+                                                        list.add(dto);
+                                                    }
+                                                    thunderDataMap.put(startTime, list);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+
                                 //强对流图层数据
                                 scwWindDataMap.clear();
                                 scwRainDataMap.clear();
@@ -737,6 +821,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
 
                                 //雷达图层数据
                                 radarDataMap.clear();
+                                radarList.clear();
                                 if (!object.isNull("radar")) {
                                     JSONObject obj = object.getJSONObject("radar");
 
@@ -748,7 +833,13 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                 StrongStreamDto dto = new StrongStreamDto();
                                                 dto.imgUrl = "http://radar-qpfref.tianqi.cn/"+itemUrl;
                                                 dto.startTime = itemUrl.substring(itemUrl.length()-16, itemUrl.length()-4);
+                                                if (i == array.length()-1) {
+                                                    dto.isCurrentTime = true;
+                                                    dto.tag = dto.startTime;
+//                                                    drawMutiElement(dto.startTime);
+                                                }
                                                 radarDataMap.put(dto.startTime, dto);
+                                                radarList.add(dto);
                                             }
                                         }
                                     }
@@ -756,102 +847,27 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                     if (!obj.isNull("files_after")) {
                                         JSONArray array = obj.getJSONArray("files_after");
                                         for (int i = 0; i < array.length(); i++) {
-                                            String itemUrl = array.getString(i);
-                                            StrongStreamDto dto = new StrongStreamDto();
-                                            dto.imgUrl = "http://radar-qpfref.tianqi.cn/"+itemUrl;
-                                            dto.startTime = itemUrl.substring(itemUrl.length()-16, itemUrl.length()-4);
-                                            radarDataMap.put(dto.startTime, dto);
-                                        }
-                                    }
-                                }
-
-                                //闪电数据
-                                radarList.clear();
-                                thunderDataMap.clear();
-                                if (!object.isNull("lightning")) {
-                                    JSONObject obj = object.getJSONObject("lightning");
-                                    if (!obj.isNull("observe")) {
-                                        JSONArray array = obj.getJSONArray("observe");
-                                        for (int i = 0; i < array.length(); i++) {
-                                            JSONObject itemObj = array.getJSONObject(i);
-                                            if (!itemObj.isNull("startTime")) {
-                                                final String startTime = itemObj.getString("startTime");
-                                                if (!itemObj.isNull("data")) {
-                                                    JSONArray dataArray = itemObj.getJSONArray("data");
-                                                    List<StrongStreamDto> list = new ArrayList<>();
-                                                    for (int j = 0; j < dataArray.length(); j++) {
-                                                        JSONObject dataObj = dataArray.getJSONObject(j);
-                                                        StrongStreamDto dto = new StrongStreamDto();
-                                                        if (!dataObj.isNull("lat")) {
-                                                            dto.lat = dataObj.getDouble("lat");
-                                                        }
-                                                        if (!dataObj.isNull("lon")) {
-                                                            dto.lng = dataObj.getDouble("lon");
-                                                        }
-                                                        if (!dataObj.isNull("type")) {
-                                                            dto.type = dataObj.getString("type");
-                                                        }
-                                                        if (!dataObj.isNull("num")) {
-                                                            dto.num = dataObj.getString("num");
-                                                        }
-                                                        list.add(dto);
+                                            if (i == array.length()-1) {
+                                                for (int j = 0; j <= 12; j++) {
+                                                    String itemUrl = array.getString(i);
+                                                    StrongStreamDto dto = new StrongStreamDto();
+                                                    dto.imgUrl = "http://radar-qpfref.tianqi.cn/"+itemUrl;
+                                                    String time = itemUrl.substring(itemUrl.length()-16, itemUrl.length()-4);
+                                                    try {
+                                                        dto.startTime = sdf3.format(sdf3.parse(time).getTime()+1000*60*5*j);
+                                                        radarDataMap.put(dto.startTime, dto);
+                                                        radarList.add(dto);
+                                                    } catch (ParseException e) {
+                                                        e.printStackTrace();
                                                     }
-                                                    thunderDataMap.put(startTime, list);
                                                 }
-
-                                                StrongStreamDto data = new StrongStreamDto();
-                                                data.startTime = startTime;
-                                                if (i == array.length()-1) {
-                                                    data.isCurrentTime = true;
-                                                    data.tag = startTime;
-                                                    drawMutiElement(startTime);
-                                                    getActivity().runOnUiThread(new Runnable() {
-                                                        @Override
-                                                        public void run() {
-                                                            try {
-                                                                tvTime.setText(sdf4.format(sdf3.parse(startTime))+"发布");
-                                                            } catch (ParseException e) {
-                                                                e.printStackTrace();
-                                                            }
-                                                        }
-                                                    });
-                                                }
-                                                radarList.add(data);
-                                            }
-                                        }
-                                    }
-
-                                    if (!obj.isNull("forecast")) {
-                                        JSONArray array = obj.getJSONArray("forecast");
-                                        for (int i = 0; i < array.length(); i++) {
-                                            JSONObject itemObj = array.getJSONObject(i);
-                                            if (!itemObj.isNull("startTime")) {
-                                                String startTime = itemObj.getString("startTime");
-                                                StrongStreamDto data = new StrongStreamDto();
-                                                data.startTime = startTime;
-                                                radarList.add(data);
-                                                if (!itemObj.isNull("data")) {
-                                                    JSONArray dataArray = itemObj.getJSONArray("data");
-                                                    List<StrongStreamDto> list = new ArrayList<>();
-                                                    for (int j = 0; j < dataArray.length(); j++) {
-                                                        JSONObject dataObj = dataArray.getJSONObject(j);
-                                                        StrongStreamDto dto = new StrongStreamDto();
-                                                        if (!dataObj.isNull("lat")) {
-                                                            dto.lat = dataObj.getDouble("lat");
-                                                        }
-                                                        if (!dataObj.isNull("lon")) {
-                                                            dto.lng = dataObj.getDouble("lon");
-                                                        }
-                                                        if (!dataObj.isNull("type")) {
-                                                            dto.type = dataObj.getString("type");
-                                                        }
-                                                        if (!dataObj.isNull("num")) {
-                                                            dto.num = dataObj.getString("num");
-                                                        }
-                                                        list.add(dto);
-                                                    }
-                                                    thunderDataMap.put(startTime, list);
-                                                }
+                                            }else {
+                                                String itemUrl = array.getString(i);
+                                                StrongStreamDto dto = new StrongStreamDto();
+                                                dto.imgUrl = "http://radar-qpfref.tianqi.cn/"+itemUrl;
+                                                dto.startTime = itemUrl.substring(itemUrl.length()-16, itemUrl.length()-4);
+                                                radarDataMap.put(dto.startTime, dto);
+                                                radarList.add(dto);
                                             }
                                         }
                                     }
@@ -920,7 +936,6 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                     if (radarDataMap.size() > 0) {
                                         startDownloadRadarImgs();
                                     }
-
                                 }
 
                             } catch (JSONException e) {
