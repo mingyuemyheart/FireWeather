@@ -1331,7 +1331,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
             List<Polyline> polylines = new ArrayList<>();
             for (List<StrongStreamDto> itemList : list) {
                 PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.color(0xff6727b0);
+                polylineOptions.color(0xffdf9a44);
                 polylineOptions.width(8);
                 for (StrongStreamDto dto : itemList) {
                     polylineOptions.add(new LatLng(dto.lat, dto.lng));
@@ -1348,7 +1348,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
             List<Polyline> polylines = new ArrayList<>();
             for (List<StrongStreamDto> itemList : list) {
                 PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.color(0xff0070c6);
+                polylineOptions.color(0xff6cdede);
                 polylineOptions.width(8);
                 for (StrongStreamDto dto : itemList) {
                     polylineOptions.add(new LatLng(dto.lat, dto.lng));
@@ -1365,7 +1365,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
             List<Polyline> polylines = new ArrayList<>();
             for (List<StrongStreamDto> itemList : list) {
                 PolylineOptions polylineOptions = new PolylineOptions();
-                polylineOptions.color(0xffc20052);
+                polylineOptions.color(0xffdd3de6);
                 polylineOptions.width(8);
                 for (StrongStreamDto dto : itemList) {
                     polylineOptions.add(new LatLng(dto.lat, dto.lng));
