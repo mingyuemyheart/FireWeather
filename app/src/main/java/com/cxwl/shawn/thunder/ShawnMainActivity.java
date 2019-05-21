@@ -1,5 +1,6 @@
 package com.cxwl.shawn.thunder;
 
+import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +49,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shawn_activity_main);
         mContext = this;
-        AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
+        checkStorageAuthority();
         checkMultiAuthority();
     }
 
@@ -275,6 +277,38 @@ public class ShawnMainActivity extends ShawnBaseActivity {
             case AuthorityUtil.AUTHOR_MULTI:
                 init();
                 break;
+            case AuthorityUtil.AUTHOR_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    try {
+                        AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    }
+                }else {
+                    if (!ActivityCompat.shouldShowRequestPermissionRationale(ShawnMainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                        AuthorityUtil.intentAuthorSetting(mContext, "\""+getString(R.string.app_name)+"\""+"需要使用存储权限，是否前往设置？");
+                    }
+                }
+                break;
+        }
+    }
+
+    /**
+     * 申请存储权限
+     */
+    private void checkStorageAuthority() {
+        if (Build.VERSION.SDK_INT < 23) {
+            try {
+                AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
+            } catch (SecurityException e) {
+                e.printStackTrace();
+            }
+        }else {
+            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(ShawnMainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, AuthorityUtil.AUTHOR_STORAGE);
+            }else {
+                AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
+            }
         }
     }
 

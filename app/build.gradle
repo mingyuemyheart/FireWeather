@@ -10,8 +10,8 @@ android {
         applicationId "com.cxwl.shawn.thunder"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 16
-        versionName "1.1.5"
+        versionCode 17
+        versionName "1.1.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
