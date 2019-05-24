@@ -54,7 +54,7 @@ public class AutoUpdateUtil {
 	 * 获取版本号
 	 * @return 当前应用的版本号
 	 */
-	public static int getVersionCode(Context context) {
+	private static int getVersionCode(Context context) {
 	    try {
 	        PackageManager manager = context.getPackageManager();
 	        PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
@@ -89,9 +89,7 @@ public class AutoUpdateUtil {
 				OkHttpUtil.enqueue(new okhttp3.Request.Builder().post(body).url(url).build(), new Callback() {
 					@Override
 					public void onFailure(Call call, IOException e) {
-
 					}
-
 					@Override
 					public void onResponse(Call call, Response response) throws IOException {
 						if (!response.isSuccessful()) {
@@ -143,9 +141,9 @@ public class AutoUpdateUtil {
 	
 	private static class UpdateDto {
 		public String version = "";
-		public String update_info = "";
-		public String dl_url = "";
-		public int versionCode = 0;
+		private String update_info = "";
+		private String dl_url = "";
+		private int versionCode = 0;
 	}
 
 	@SuppressLint("HandlerLeak")
@@ -243,7 +241,6 @@ public class AutoUpdateUtil {
 					}
 					context.startActivity(intent);
 				}
-
 			}
 		};
 		IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
