@@ -1,6 +1,5 @@
 package com.cxwl.shawn.thunder;
 
-import android.Manifest;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -14,7 +13,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,7 +47,6 @@ public class ShawnMainActivity extends ShawnBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.shawn_activity_main);
         mContext = this;
-        checkStorageAuthority();
         checkMultiAuthority();
     }
 
@@ -59,6 +56,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
     }
 
     private void initWidget() {
+        AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
         iv1 = findViewById(R.id.iv1);
         iv2 = findViewById(R.id.iv2);
         iv3 = findViewById(R.id.iv3);
@@ -71,8 +69,8 @@ public class ShawnMainActivity extends ShawnBaseActivity {
         ll1.setOnClickListener(new MyOnClickListener(0));
         LinearLayout ll2 = findViewById(R.id.ll2);
         ll2.setOnClickListener(new MyOnClickListener(1));
-        LinearLayout ll3 = findViewById(R.id.ll3);
-        ll3.setOnClickListener(new MyOnClickListener(2));
+//        LinearLayout ll3 = findViewById(R.id.ll3);
+//        ll3.setOnClickListener(new MyOnClickListener(2));
         LinearLayout ll4 = findViewById(R.id.ll4);
         ll4.setOnClickListener(new MyOnClickListener(3));
     }
@@ -85,8 +83,8 @@ public class ShawnMainActivity extends ShawnBaseActivity {
         fragments.add(fragment);
         fragment = new Fragment2();
         fragments.add(fragment);
-        fragment = new Fragment3();
-        fragments.add(fragment);
+//        fragment = new Fragment3();
+//        fragments.add(fragment);
         fragment = new Fragment4();
         fragments.add(fragment);
 
@@ -135,23 +133,23 @@ public class ShawnMainActivity extends ShawnBaseActivity {
                     tv3.setTextColor(getResources().getColor(R.color.text_color4));
                     tv4.setTextColor(getResources().getColor(R.color.text_color4));
                     break;
-                case 2:
-                    if (!BROADCAST_ACTION_NAME.contains(Fragment3.class.getName())) {
-                        Intent intent = new Intent();
-                        intent.setAction(Fragment3.class.getName());
-                        sendBroadcast(intent);
-                        BROADCAST_ACTION_NAME += Fragment3.class.getName();
-                    }
-
-                    iv1.setImageResource(R.drawable.tab_icon_yb);
-                    iv2.setImageResource(R.drawable.tab_icon_tj);
-                    iv3.setImageResource(R.drawable.tab_icon_kpon);
-                    iv4.setImageResource(R.drawable.tab_icon_wd);
-                    tv1.setTextColor(getResources().getColor(R.color.text_color4));
-                    tv2.setTextColor(getResources().getColor(R.color.text_color4));
-                    tv3.setTextColor(Color.WHITE);
-                    tv4.setTextColor(getResources().getColor(R.color.text_color4));
-                    break;
+//                case 2:
+//                    if (!BROADCAST_ACTION_NAME.contains(Fragment3.class.getName())) {
+//                        Intent intent = new Intent();
+//                        intent.setAction(Fragment3.class.getName());
+//                        sendBroadcast(intent);
+//                        BROADCAST_ACTION_NAME += Fragment3.class.getName();
+//                    }
+//
+//                    iv1.setImageResource(R.drawable.tab_icon_yb);
+//                    iv2.setImageResource(R.drawable.tab_icon_tj);
+//                    iv3.setImageResource(R.drawable.tab_icon_kpon);
+//                    iv4.setImageResource(R.drawable.tab_icon_wd);
+//                    tv1.setTextColor(getResources().getColor(R.color.text_color4));
+//                    tv2.setTextColor(getResources().getColor(R.color.text_color4));
+//                    tv3.setTextColor(Color.WHITE);
+//                    tv4.setTextColor(getResources().getColor(R.color.text_color4));
+//                    break;
                 case 3:
                     iv1.setImageResource(R.drawable.tab_icon_yb);
                     iv2.setImageResource(R.drawable.tab_icon_tj);
@@ -277,38 +275,6 @@ public class ShawnMainActivity extends ShawnBaseActivity {
             case AuthorityUtil.AUTHOR_MULTI:
                 init();
                 break;
-            case AuthorityUtil.AUTHOR_STORAGE:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    try {
-                        AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
-                    } catch (SecurityException e) {
-                        e.printStackTrace();
-                    }
-                }else {
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(ShawnMainActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                        AuthorityUtil.intentAuthorSetting(mContext, "\""+getString(R.string.app_name)+"\""+"需要使用存储权限，是否前往设置？");
-                    }
-                }
-                break;
-        }
-    }
-
-    /**
-     * 申请存储权限
-     */
-    private void checkStorageAuthority() {
-        if (Build.VERSION.SDK_INT < 23) {
-            try {
-                AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            }
-        }else {
-            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(ShawnMainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, AuthorityUtil.AUTHOR_STORAGE);
-            }else {
-                AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), true);
-            }
         }
     }
 
