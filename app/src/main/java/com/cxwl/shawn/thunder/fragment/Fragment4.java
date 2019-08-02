@@ -93,11 +93,11 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
 
         if (!TextUtils.isEmpty(MyApplication.NICKNAME)) {
             tvUserName.setText(MyApplication.NICKNAME);
-            llCheck.setVisibility(View.VISIBLE);
+//            llCheck.setVisibility(View.VISIBLE);
 //            llPublish.setVisibility(View.VISIBLE);
         }else if (!TextUtils.isEmpty(MyApplication.USERNAME)) {
             tvUserName.setText(MyApplication.USERNAME);
-            llCheck.setVisibility(View.VISIBLE);
+//            llCheck.setVisibility(View.VISIBLE);
 //            llPublish.setVisibility(View.VISIBLE);
         }else {
             tvUserName.setText("未登录");
