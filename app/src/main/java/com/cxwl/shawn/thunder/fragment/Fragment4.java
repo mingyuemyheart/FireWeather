@@ -28,6 +28,7 @@ import com.cxwl.shawn.thunder.ShawnCheckActivity;
 import com.cxwl.shawn.thunder.ShawnFeedbackActivity;
 import com.cxwl.shawn.thunder.ShawnNewsActivity;
 import com.cxwl.shawn.thunder.ShawnPersonInfoActivity;
+import com.cxwl.shawn.thunder.ShawnProtocalActivity;
 import com.cxwl.shawn.thunder.ShawnSettingActivity;
 import com.cxwl.shawn.thunder.common.CONST;
 import com.cxwl.shawn.thunder.common.MyApplication;
@@ -74,6 +75,8 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
         llSetting.setOnClickListener(this);
         LinearLayout llIntro = view.findViewById(R.id.llIntro);
         llIntro.setOnClickListener(this);
+        LinearLayout llProtocal = view.findViewById(R.id.llProtocal);
+        llProtocal.setOnClickListener(this);
 
         refreshUserInfo();
 
@@ -134,6 +137,9 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                 break;
             case R.id.llIntro:
                 startActivity(new Intent(getActivity(), ShawnIntroActivity.class));
+                break;
+            case R.id.llProtocal:
+                startActivity(new Intent(getActivity(), ShawnProtocalActivity.class));
                 break;
 
         }
