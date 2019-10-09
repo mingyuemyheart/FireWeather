@@ -574,9 +574,21 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                 OkHttpUtil.enqueue(new Request.Builder().url(url).build(), new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingView.setVisibility(View.GONE);
+                            }
+                        });
                     }
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                loadingView.setVisibility(View.GONE);
+                            }
+                        });
                         if (!response.isSuccessful()) {
                             return;
                         }
