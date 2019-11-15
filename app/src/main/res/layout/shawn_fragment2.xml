@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/ivLoc"
-            android:textSize="@dimen/level_5"
+            android:textSize="@dimen/level_4"
             android:textColor="@color/text_color2"/>
 
         <LinearLayout
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:layout_toEndOf="@+id/ivLoc"
-            android:textSize="@dimen/level_5"
+            android:textSize="@dimen/level_4"
             android:textColor="@color/text_color3"/>
 
         <LinearLayout

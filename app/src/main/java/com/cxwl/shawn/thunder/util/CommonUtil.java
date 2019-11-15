@@ -1,6 +1,7 @@
 package com.cxwl.shawn.thunder.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -450,6 +451,24 @@ public class CommonUtil {
             }
         }
         return -1;
+    }
+
+    public static void saveTextSize(Context context, float textSize, int progress) {
+        SharedPreferences sp = context.getSharedPreferences("text_size", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putFloat("textSize", textSize);
+        editor.putInt("progress", progress);
+        editor.apply();
+    }
+
+    public static float getTextSize(Context context) {
+        SharedPreferences sp = context.getSharedPreferences("text_size", Context.MODE_PRIVATE);
+        return sp.getFloat("textSize", 14);
+    }
+
+    public static float getProgress(Context context) {
+        SharedPreferences sp = context.getSharedPreferences("text_size", Context.MODE_PRIVATE);
+        return sp.getFloat("progress", 14);
     }
 
 }

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/light_gray"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/reTitle"
+        layout="@layout/shawn_layout_title" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/reTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reTitle">
+
+        <ImageView
+            android:id="@+id/ivLoc"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="3dp"
+            android:src="@drawable/shawn_icon_location_black"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvPosition"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="北京市 | 海淀区"
+            android:textColor="@color/text_color3"
+            android:textSize="@dimen/level_4"
+            app:layout_constraintStart_toEndOf="@+id/ivLoc"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvStreet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="中关村南大街46号"
+            android:textColor="@color/text_color2"
+            android:textSize="@dimen/level_5"
+            app:layout_constraintStart_toEndOf="@+id/ivLoc"
+            app:layout_constraintTop_toBottomOf="@+id/tvPosition" />
+
+        <TextView
+            android:id="@+id/tvFact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="温度7℃ | 湿度58% | 东风微风 | 空气质量 优 31"
+            android:textColor="@color/text_color2"
+            android:textSize="@dimen/level_5"
+            app:layout_constraintStart_toEndOf="@+id/ivLoc"
+            app:layout_constraintTop_toBottomOf="@+id/tvStreet" />
+
+        <ImageView
+            android:id="@+id/ivThunderFar"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/shawn_icon_thunder_far"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvFact" />
+
+        <TextView
+            android:id="@+id/tvThunder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="未来两小时无雷电。"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/level_4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvFact" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ivThunderFar">
+
+            <ImageView
+                android:id="@+id/ivPlay"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:padding="5dp"
+                android:src="@drawable/shawn_icon_play" />
+
+            <TextView
+                android:id="@+id/tvSeekbarTime"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:background="@color/light_gray"
+                android:textColor="@color/text_color3"
+                android:textSize="@dimen/level_6" />
+
+        </LinearLayout>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:padding="15dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
+            android:text="小"
+            android:layout_marginBottom="20dp"
+            android:textSize="@dimen/level_3"
+            android:textColor="@color/text_color2"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/seekBar"
+            android:text="大"
+            android:layout_marginBottom="20dp"
+            android:textSize="@dimen/level_3"
+            android:textColor="@color/text_color2"/>
+
+        <SeekBar
+            android:id="@+id/seekBar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.constraint.ConstraintLayout>

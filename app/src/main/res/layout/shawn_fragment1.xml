@@ -48,7 +48,7 @@
             android:layout_below="@+id/tvPosition"
             android:layout_toEndOf="@+id/ivLoc"
             android:textColor="@color/text_color2"
-            android:textSize="@dimen/level_5"/>
+            android:textSize="@dimen/level_4"/>
 
         <TextView
             android:id="@+id/tvFact"
@@ -57,7 +57,7 @@
             android:layout_below="@+id/tvStreet"
             android:layout_toEndOf="@+id/ivLoc"
             android:textColor="@color/text_color2"
-            android:textSize="@dimen/level_5"/>
+            android:textSize="@dimen/level_4"/>
 
         <ImageView
             android:id="@+id/ivThunderFar"

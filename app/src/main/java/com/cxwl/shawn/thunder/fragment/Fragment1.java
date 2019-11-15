@@ -2,8 +2,10 @@ package com.cxwl.shawn.thunder.fragment;
 
 import android.app.Dialog;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -13,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -194,6 +197,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         super.onViewCreated(view, savedInstanceState);
         initWidget(view);
         initAmap(view, savedInstanceState);
+        initBroadCast();
     }
 
     private void initWidget(View view) {
@@ -283,6 +287,10 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         rainManager = new RainManager(getActivity());
         leibaoManager = new LeibaoManager(getActivity());
         yundingManager = new YdgdManager(getActivity());
+
+        float textSize = CommonUtil.getTextSize(getActivity());
+        tvFact.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvThunder.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         startTimer();
 
@@ -472,7 +480,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
 //                                                    tvTime.setText(sdf1.format(new Date())+" "+time+"发布");
 //                                                }
 //                                            }
-                                            String factTemp = "", humidity = "", wind = "", visible = "";
+                                            String factTemp = "", humidity = "", wind = "";
                                             if (!l.isNull("l1")) {
                                                 factTemp = "温度"+WeatherUtil.lastValue(l.getString("l1"))+"℃ | ";
                                             }
@@ -492,13 +500,16 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                             WeatherUtil.getFactWindForce(Integer.valueOf(windForce))+" | ";
                                                 }
                                             }
-                                            if (!l.isNull("l9")) {
-                                                visible = WeatherUtil.lastValue(l.getString("l9"));
-                                                if (!TextUtils.isEmpty(visible)) {
-                                                    visible = "能见度"+Float.valueOf(visible)/1000.0f+"km";
-                                                }
+                                            tvFact.setText(factTemp+humidity+wind);
+                                        }
+
+                                        //aqi信息
+                                        if (!obj.isNull("k")) {
+                                            JSONObject k = obj.getJSONObject("k");
+                                            if (!k.isNull("k3")) {
+                                                String aqi = WeatherUtil.lastValue(k.getString("k3"));
+                                                tvFact.setText(tvFact.getText().toString()+" 空气质量" + WeatherUtil.getAqi(getActivity(), Integer.valueOf(aqi)) + " " + aqi);
                                             }
-                                            tvFact.setText(factTemp+humidity+wind+visible);
                                         }
 
                                     } catch (JSONException e) {
@@ -870,6 +881,8 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                                                         radarDataMap.put(dto.startTime, dto);
                                                         radarList.add(dto);
                                                     } catch (ParseException e) {
+                                                        e.printStackTrace();
+                                                    } catch (ArrayIndexOutOfBoundsException e) {
                                                         e.printStackTrace();
                                                     }
                                                 }
@@ -2835,4 +2848,35 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
         }
     }
 
+    private MyBroadCastReiceiver mReceiver;
+
+    private void initBroadCast() {
+        mReceiver = new MyBroadCastReiceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("broadcast_textsize");
+        getActivity().registerReceiver(mReceiver, intentFilter);
+    }
+
+    private class MyBroadCastReiceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (TextUtils.equals(intent.getAction(), "broadcast_textsize")) {
+                float textSize = CommonUtil.getTextSize(getActivity());
+                tvFact.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvThunder.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            }
+        }
+    }
+
+    private void unregisterBroadCast() {
+        if (mReceiver != null) {
+            getActivity().unregisterReceiver(mReceiver);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unregisterBroadCast();
+    }
 }

@@ -2,6 +2,7 @@ package com.cxwl.shawn.thunder;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -41,6 +42,8 @@ public class ShawnSettingActivity extends ShawnBaseActivity implements View.OnCl
         llVersion.setOnClickListener(this);
         tvCache = findViewById(R.id.tvCache);
         TextView tvVersion = findViewById(R.id.tvVersion);
+        LinearLayout llTextSize = findViewById(R.id.llTextSize);
+        llTextSize.setOnClickListener(this);
 
         try {
             String cache = DataCleanManager.getCacheSize(mContext);
@@ -106,6 +109,9 @@ public class ShawnSettingActivity extends ShawnBaseActivity implements View.OnCl
                 break;
             case R.id.llVersion:
                 AutoUpdateUtil.checkUpdate(this, mContext, "99", getString(R.string.app_name), false);
+                break;
+            case R.id.llTextSize:
+                startActivity(new Intent(mContext, ShawnTextsizeActivity.class));
                 break;
 
         }

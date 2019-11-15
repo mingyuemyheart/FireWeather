@@ -72,7 +72,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
 //        LinearLayout ll3 = findViewById(R.id.ll3);
 //        ll3.setOnClickListener(new MyOnClickListener(2));
         LinearLayout ll4 = findViewById(R.id.ll4);
-        ll4.setOnClickListener(new MyOnClickListener(3));
+        ll4.setOnClickListener(new MyOnClickListener(2));
     }
 
     /**
@@ -150,7 +150,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
 //                    tv3.setTextColor(Color.WHITE);
 //                    tv4.setTextColor(getResources().getColor(R.color.text_color4));
 //                    break;
-                case 3:
+                case 2:
                     iv1.setImageResource(R.drawable.tab_icon_yb);
                     iv2.setImageResource(R.drawable.tab_icon_tj);
                     iv3.setImageResource(R.drawable.tab_icon_kp);

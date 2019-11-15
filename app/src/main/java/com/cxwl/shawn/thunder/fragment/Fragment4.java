@@ -2,7 +2,10 @@ package com.cxwl.shawn.thunder.fragment;
 
 import android.Manifest;
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +37,7 @@ import com.cxwl.shawn.thunder.ShawnSettingActivity;
 import com.cxwl.shawn.thunder.common.CONST;
 import com.cxwl.shawn.thunder.common.MyApplication;
 import com.cxwl.shawn.thunder.util.AuthorityUtil;
+import com.cxwl.shawn.thunder.util.CommonUtil;
 import com.cxwl.shawn.thunder.view.CircleImageView;
 
 /**
@@ -41,7 +46,7 @@ import com.cxwl.shawn.thunder.view.CircleImageView;
 public class Fragment4 extends Fragment implements View.OnClickListener {
 
     private CircleImageView ivPortrait;
-    private TextView tvUserName;
+    private TextView tvUserName,tvCheck,tvPublish,tvNews,tvFeedback,tvAbout,tvSetting,tvIntro,tvProtocal;
     private LinearLayout llCheck,llPublish;
 
     @Nullable
@@ -54,9 +59,18 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initWidget(view);
+        initBroadCast();
     }
 
     private void initWidget(View view) {
+        tvCheck = view.findViewById(R.id.tvCheck);
+        tvPublish = view.findViewById(R.id.tvPublish);
+        tvNews = view.findViewById(R.id.tvNews);
+        tvFeedback = view.findViewById(R.id.tvFeedback);
+        tvAbout = view.findViewById(R.id.tvAbout);
+        tvSetting = view.findViewById(R.id.tvSetting);
+        tvIntro = view.findViewById(R.id.tvIntro);
+        tvProtocal = view.findViewById(R.id.tvProtocal);
         RelativeLayout rePortrait = view.findViewById(R.id.rePortrait);
         rePortrait.setOnClickListener(this);
         ivPortrait = view.findViewById(R.id.ivPortrait);
@@ -77,6 +91,16 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
         llIntro.setOnClickListener(this);
         LinearLayout llProtocal = view.findViewById(R.id.llProtocal);
         llProtocal.setOnClickListener(this);
+
+        float textSize = CommonUtil.getTextSize(getActivity());
+        tvCheck.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvPublish.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvNews.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvFeedback.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvAbout.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvSetting.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvIntro.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+        tvProtocal.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         refreshUserInfo();
 
@@ -186,6 +210,44 @@ public class Fragment4 extends Fragment implements View.OnClickListener {
                 }
                 break;
         }
+    }
+
+    private MyBroadCastReiceiver mReceiver;
+
+    private void initBroadCast() {
+        mReceiver = new MyBroadCastReiceiver();
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction("broadcast_textsize");
+        getActivity().registerReceiver(mReceiver, intentFilter);
+    }
+
+    private class MyBroadCastReiceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (TextUtils.equals(intent.getAction(), "broadcast_textsize")) {
+                float textSize = CommonUtil.getTextSize(getActivity());
+                tvCheck.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvPublish.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvNews.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvFeedback.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvAbout.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvSetting.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvIntro.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                tvProtocal.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            }
+        }
+    }
+
+    private void unregisterBroadCast() {
+        if (mReceiver != null) {
+            getActivity().unregisterReceiver(mReceiver);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unregisterBroadCast();
     }
 
 }

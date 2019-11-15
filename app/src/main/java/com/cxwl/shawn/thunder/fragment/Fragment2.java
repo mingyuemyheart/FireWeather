@@ -103,6 +103,7 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
         mReceiver = new MyBroadCastReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Fragment2.class.getName());
+        intentFilter.addAction("broadcast_textsize");
         getActivity().registerReceiver(mReceiver, intentFilter);
     }
 
@@ -111,6 +112,11 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
         public void onReceive(Context context, Intent intent) {
             if (TextUtils.equals(intent.getAction(), Fragment2.class.getName())) {
                 init();
+            } else if (TextUtils.equals(intent.getAction(), "broadcast_textsize")) {
+                float textSize = CommonUtil.getTextSize(getActivity());
+                if (tvThunder != null) {
+                    tvThunder.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+                }
             }
         }
     }
@@ -136,6 +142,9 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
         DisplayMetrics dm = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
         width = dm.widthPixels;
+
+        float textSize = CommonUtil.getTextSize(getActivity());
+        tvThunder.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
 
         List<String> dataList = new ArrayList<>();
         dataList.add("小时,hour");
