@@ -463,7 +463,6 @@
                     android:id="@+id/ivMapType1"
                     android:layout_width="80dp"
                     android:layout_height="60dp"
-                    android:background="@drawable/shawn_bg_corner_map_press"
                     android:padding="2dp"
                     android:scaleType="fitXY"
                     android:src="@drawable/shawn_map_type_sitelite"/>
@@ -488,6 +487,7 @@
                     android:id="@+id/ivMapType2"
                     android:layout_width="80dp"
                     android:layout_height="60dp"
+                    android:background="@drawable/shawn_bg_corner_map_press"
                     android:padding="2dp"
                     android:scaleType="fitXY"
                     android:src="@drawable/shawn_map_type_normal"/>

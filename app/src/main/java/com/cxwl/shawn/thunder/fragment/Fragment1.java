@@ -103,7 +103,7 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
 
     private TextureMapView mapView;
     private AMap aMap;//高德地图
-    private int AMapType = AMap.MAP_TYPE_SATELLITE;
+    private int AMapType = AMap.MAP_TYPE_NORMAL;
     private float zoom = 7.0f;
     private AMapLocationClientOption mLocationOption;//声明mLocationOption对象
     private AMapLocationClient mLocationClient;//声明AMapLocationClient类对象

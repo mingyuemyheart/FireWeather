@@ -463,12 +463,12 @@ public class CommonUtil {
 
     public static float getTextSize(Context context) {
         SharedPreferences sp = context.getSharedPreferences("text_size", Context.MODE_PRIVATE);
-        return sp.getFloat("textSize", 14);
+        return sp.getFloat("textSize", dip2px(context, 14.0f));
     }
 
     public static float getProgress(Context context) {
         SharedPreferences sp = context.getSharedPreferences("text_size", Context.MODE_PRIVATE);
-        return sp.getFloat("progress", 14);
+        return sp.getInt("progress", 14);
     }
 
 }

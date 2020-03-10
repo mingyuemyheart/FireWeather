@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.TypedValue
 import android.widget.SeekBar
+import android.widget.TextView
 import com.cxwl.shawn.thunder.util.CommonUtil
 import kotlinx.android.synthetic.main.shawn_activity_textsize.*
+import kotlinx.android.synthetic.main.shawn_layout_title.*
 
 class ShawnTextsizeActivity : ShawnBaseActivity() {
 
@@ -16,6 +18,8 @@ class ShawnTextsizeActivity : ShawnBaseActivity() {
     }
 
     private fun initSeekbar() {
+        tvTitle.text = "内容字号大小"
+
         val textSize = CommonUtil.getTextSize(this)
         tvFact.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
         tvThunder.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
