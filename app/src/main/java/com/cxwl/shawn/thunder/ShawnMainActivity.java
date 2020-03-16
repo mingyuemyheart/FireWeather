@@ -38,9 +38,10 @@ public class ShawnMainActivity extends ShawnBaseActivity {
     private MainViewPager viewPager;
     private List<Fragment> fragments = new ArrayList<>();
     private long mExitTime;//记录点击完返回按钮后的long型时间
-    private ImageView iv1, iv2, iv3, iv4;
+    private ImageView iv1, iv2, iv3, iv4,ivControl;
     private TextView tv1, tv2, tv3, tv4;
     private String BROADCAST_ACTION_NAME = "";//四个fragment广播名字
+    private boolean isChart = false;//fragment2图标模式
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
         iv2 = findViewById(R.id.iv2);
         iv3 = findViewById(R.id.iv3);
         iv4 = findViewById(R.id.iv4);
+        ivControl = findViewById(R.id.ivControl);
         tv1 = findViewById(R.id.tv1);
         tv2 = findViewById(R.id.tv2);
         tv3 = findViewById(R.id.tv3);
@@ -107,6 +109,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
                         BROADCAST_ACTION_NAME += Fragment1.class.getName();
                     }
 
+                    ivControl.setVisibility(View.GONE);
                     iv1.setImageResource(R.drawable.tab_icon_ybon);
                     iv2.setImageResource(R.drawable.tab_icon_tj);
                     iv3.setImageResource(R.drawable.tab_icon_kp);
@@ -124,6 +127,28 @@ public class ShawnMainActivity extends ShawnBaseActivity {
                         BROADCAST_ACTION_NAME += Fragment2.class.getName();
                     }
 
+                    if (isChart) {
+                        ivControl.setImageResource(R.drawable.iv_warning_list);
+                    } else {
+                        ivControl.setImageResource(R.drawable.iv_warning_map);
+                    }
+                    ivControl.setVisibility(View.VISIBLE);
+                    ivControl.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            isChart = !isChart;
+                            if (isChart) {
+                                ivControl.setImageResource(R.drawable.iv_warning_list);
+                            } else {
+                                ivControl.setImageResource(R.drawable.iv_warning_map);
+                            }
+
+                            Intent intent = new Intent();
+                            intent.putExtra("isChart", isChart);
+                            intent.setAction("broadcast_isChart");
+                            sendBroadcast(intent);
+                        }
+                    });
                     iv1.setImageResource(R.drawable.tab_icon_yb);
                     iv2.setImageResource(R.drawable.tab_icon_tjon);
                     iv3.setImageResource(R.drawable.tab_icon_kp);
@@ -141,6 +166,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
 //                        BROADCAST_ACTION_NAME += Fragment3.class.getName();
 //                    }
 //
+//                    ivControl.setVisibility(View.GONE);
 //                    iv1.setImageResource(R.drawable.tab_icon_yb);
 //                    iv2.setImageResource(R.drawable.tab_icon_tj);
 //                    iv3.setImageResource(R.drawable.tab_icon_kpon);
@@ -151,6 +177,7 @@ public class ShawnMainActivity extends ShawnBaseActivity {
 //                    tv4.setTextColor(getResources().getColor(R.color.text_color4));
 //                    break;
                 case 2:
+                    ivControl.setVisibility(View.GONE);
                     iv1.setImageResource(R.drawable.tab_icon_yb);
                     iv2.setImageResource(R.drawable.tab_icon_tj);
                     iv3.setImageResource(R.drawable.tab_icon_kp);
