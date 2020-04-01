@@ -99,6 +99,7 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
     private MyBroadCastReceiver mReceiver;
     private boolean isChart = false;
     private ConstraintLayout clList,clChart;
+    private ImageView ivLegend;
 
     private TextView tvTime;
     private String hourTime = "20170101000000",dayTime = "20120101000000",tendaysTime = "20120101000000",monthAverTime = "20170101000000",monthTime = "20120101000000",yearTime = "20120101000000";
@@ -168,10 +169,12 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
                 if (isChart) {
                     clList.setVisibility(View.GONE);
                     clChart.setVisibility(View.VISIBLE);
+                    ivLegend.setVisibility(View.VISIBLE);
                     showOverlay();
                 } else {
                     clList.setVisibility(View.VISIBLE);
                     clChart.setVisibility(View.GONE);
+                    ivLegend.setVisibility(View.GONE);
                     hideOverlay();
                 }
             }
@@ -207,6 +210,7 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
         tvNegtive.setOnClickListener(this);
         tvPositive = view.findViewById(R.id.tvPositive);
         tvPositive.setOnClickListener(this);
+        ivLegend = view.findViewById(R.id.ivLegend);
 
         geocoderSearch = new GeocodeSearch(getActivity());
         geocoderSearch.setOnGeocodeSearchListener(this);
@@ -454,6 +458,8 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            Picasso.get().load("http://decision-admin.tianqi.cn/Public/images/lighting/multiyear_mean_lightDensity_hour.jpg").into(ivLegend);
         } else if (TextUtils.equals(tag, "day")) {
             imgUrl = String.format("http://decision-admin.tianqi.cn/infomes/data/lightning/nc_tj_data/LightDensity_day_2012_2017/%s.png", dayTime);
             try {
@@ -461,6 +467,8 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            Picasso.get().load("http://decision-admin.tianqi.cn/Public/images/lighting/LightDensity_day_2012_2017.jpg").into(ivLegend);
         } else if (TextUtils.equals(tag, "tendays")) {
             imgUrl = String.format("http://decision-admin.tianqi.cn/infomes/data/lightning/nc_tj_data/LightDensity_Tendays_2012_2017/%s.png", tendaysTime);
             try {
@@ -477,6 +485,8 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            Picasso.get().load("http://decision-admin.tianqi.cn/Public/images/lighting/LightDensity_Tendays_2012_2017.jpg").into(ivLegend);
         } else if (TextUtils.equals(tag, "monthAver")) {
             imgUrl = String.format("http://decision-admin.tianqi.cn/infomes/data/lightning/nc_tj_data/multiyear_mean_lightDensity_month/%s.png", monthAverTime);
             try {
@@ -484,6 +494,8 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            Picasso.get().load("http://decision-admin.tianqi.cn/Public/images/lighting/multiyear_mean_lightDensity_month.jpg").into(ivLegend);
         } else if (TextUtils.equals(tag, "month")) {
             imgUrl = String.format("http://decision-admin.tianqi.cn/infomes/data/lightning/nc_tj_data/LightDensity_month_2012_2017/%s.png", monthTime);
             try {
@@ -491,6 +503,8 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            Picasso.get().load("http://decision-admin.tianqi.cn/Public/images/lighting/LightDensity_month_2012_2017.jpg").into(ivLegend);
         } else if (TextUtils.equals(tag, "year")) {
             imgUrl = String.format("http://decision-admin.tianqi.cn/infomes/data/lightning/nc_tj_data/LightDensity_Annual_2012_2017/%s.png", yearTime);
             try {
@@ -498,8 +512,9 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            Picasso.get().load("http://decision-admin.tianqi.cn/Public/images/lighting/LightDensity_Annual_2012_2017.jpg").into(ivLegend);
         }
-        Log.e("imagUrl", imgUrl);
         if (TextUtils.isEmpty(imgUrl)) {
             return;
         }

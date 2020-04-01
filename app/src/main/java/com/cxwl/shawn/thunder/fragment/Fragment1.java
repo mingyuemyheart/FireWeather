@@ -2564,30 +2564,31 @@ public class Fragment1 extends Fragment implements View.OnClickListener, AMap.On
                 break;
             case R.id.ll2:
             case R.id.ivMore2:
-                isShowRain = !isShowRain;
-                if (isShowRain) {
-                    iv2.setImageResource(R.drawable.shawn_icon_rainon);
-                    tv2.setTextColor(Color.WHITE);
-                    ll2.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                    ivMore2.setImageResource(R.drawable.shawn_icon_more_rainon);
-                    ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_rain));
-                    if (rainDataMap.size() <= 0) {
-                        if (CommonUtil.getConnectedType(getActivity()) == 1) {
-                            OkHttpRain();
-                        }else {
-                            dialogNetwork(2);
-                        }
-                    }else {
-                        drawFirstRainImg();
-                    }
-                }else {
-                    iv2.setImageResource(R.drawable.shawn_icon_rain);
-                    tv2.setTextColor(getResources().getColor(R.color.text_color3));
-                    ll2.setBackgroundColor(Color.TRANSPARENT);
-                    ivMore2.setImageResource(R.drawable.shawn_icon_more_rain);
-                    ivLegend.setImageDrawable(null);
-                    removeRainOverlay();
-                }
+                Toast.makeText(getActivity(), "暂无数据，敬请期待！！！", Toast.LENGTH_SHORT).show();
+//                isShowRain = !isShowRain;
+//                if (isShowRain) {
+//                    iv2.setImageResource(R.drawable.shawn_icon_rainon);
+//                    tv2.setTextColor(Color.WHITE);
+//                    ll2.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+//                    ivMore2.setImageResource(R.drawable.shawn_icon_more_rainon);
+//                    ivLegend.setImageDrawable(getResources().getDrawable(R.drawable.shawn_legend_rain));
+//                    if (rainDataMap.size() <= 0) {
+//                        if (CommonUtil.getConnectedType(getActivity()) == 1) {
+//                            OkHttpRain();
+//                        }else {
+//                            dialogNetwork(2);
+//                        }
+//                    }else {
+//                        drawFirstRainImg();
+//                    }
+//                }else {
+//                    iv2.setImageResource(R.drawable.shawn_icon_rain);
+//                    tv2.setTextColor(getResources().getColor(R.color.text_color3));
+//                    ll2.setBackgroundColor(Color.TRANSPARENT);
+//                    ivMore2.setImageResource(R.drawable.shawn_icon_more_rain);
+//                    ivLegend.setImageDrawable(null);
+//                    removeRainOverlay();
+//                }
                 break;
             case R.id.llMore:
                 isShowMore = !isShowMore;
