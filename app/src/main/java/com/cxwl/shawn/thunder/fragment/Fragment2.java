@@ -111,11 +111,11 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
     private SimpleDateFormat sdf8 = new SimpleDateFormat("yyyy年", Locale.CHINA);
     private String name, tag;
 
-    private List<String> xunList = new ArrayList<>();
-    private int xunIndex = 0;
-
     private List<String> hourDatas = new ArrayList<>();
     private int hourIndex = 0;
+
+    private List<String> xunList = new ArrayList<>();
+    private int xunIndex = 0;
 
     private List<String> monthDatas = new ArrayList<>();
     private int monthIndex = 0;
@@ -124,7 +124,6 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
     private int yearIndex = 0;
 
     private LinearLayout layoutDate;
-    private TextView tvNegtive, tvPositive;
 
     @Nullable
     @Override
@@ -206,9 +205,9 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
         ImageView ivNext = view.findViewById(R.id.ivNext);
         ivNext.setOnClickListener(this);
         layoutDate = view.findViewById(R.id.layoutDate);
-        tvNegtive = view.findViewById(R.id.tvNegtive);
+        TextView tvNegtive = view.findViewById(R.id.tvNegtive);
         tvNegtive.setOnClickListener(this);
-        tvPositive = view.findViewById(R.id.tvPositive);
+        TextView tvPositive = view.findViewById(R.id.tvPositive);
         tvPositive.setOnClickListener(this);
         ivLegend = view.findViewById(R.id.ivLegend);
 
@@ -232,38 +231,73 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
     private void initData() {
         //时平均列表信息
         hourDatas.clear();
-        hourIndex = 0;
+        hourIndex = new Date().getHours();
         for (int i = 0; i < 24; i++) {
             String index = i+"";
             if (i < 10) {
                 index = "0"+i;
             }
-            hourDatas.add("20170101"+index+"0000");
+            String value = "20170101"+index+"0000";
+            if (i == hourIndex) {
+                hourTime = value;
+            }
+            hourDatas.add(value);
         }
+
+        //逐日
+        dayTime = "2012"+new SimpleDateFormat("MMdd", Locale.CHINA).format(new Date())+"000000";
 
         //获取旬列表信息
         xunList.clear();
-        xunIndex = 0;
+        String dayStr;
+        int day = new Date().getDay();
+        if (day <= 10) {
+            dayStr = "01";
+        } else if (day <= 20) {
+            dayStr = "10";
+        } else {
+            dayStr = "20";
+        }
+        int month = new Date().getMonth()+1;
+        String monthStr = month+"";
+        if (month < 10) {
+            monthStr = "0"+month;
+        }
+        tendaysTime = "2012"+monthStr+dayStr+"000000";
         for (int i = 20120101; i <= 20171220; i++) {
             String count = String.valueOf(i);
             if (Integer.valueOf(count.substring(count.length()-4, count.length()-2)) <= 12 && Integer.valueOf(count.substring(count.length()-4, count.length()-2)) > 0) {
-                String xun = count.substring(count.length()-2, count.length());
+                String xun = count.substring(count.length()-2);
                 if (TextUtils.equals(xun, "01") || TextUtils.equals(xun, "10") || TextUtils.equals(xun, "20")) {
                     xunList.add(count+"000000");
                 }
             }
         }
+        for (int i = 0; i < xunList.size(); i++) {
+            if (TextUtils.equals(tendaysTime, xunList.get(i))) {
+                xunIndex = i;
+                break;
+            }
+        }
 
         //月平均列表信息
         monthDatas.clear();
-        monthIndex = 0;
+        monthIndex = new Date().getMonth()+1;
         for (int i = 1; i <= 12; i++) {
-            String value = i+"";
+            String index = i+"";
             if (i < 10) {
-                value = "0"+i;
+                index = "0"+i;
             }
-            monthDatas.add("2017"+value+"01000000");
+
+            String value = "2017"+index+"01000000";
+            if (i == monthIndex) {
+                monthAverTime = value;
+            }
+            monthDatas.add(value);
         }
+
+        //逐月
+        monthTime = "2012"+monthStr+"01000000";
 
         //年列表信息
         yearDatas.clear();
@@ -562,6 +596,8 @@ public class Fragment2 extends Fragment implements View.OnClickListener, AMap.On
     private void showOverlay() {
         if (layerOverlay != null) {
             layerOverlay.setVisible(true);
+        } else {
+            drawChartLayer();
         }
     }
 
