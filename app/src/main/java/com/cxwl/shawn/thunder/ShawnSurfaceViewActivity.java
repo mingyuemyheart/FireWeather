@@ -8,6 +8,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.constraint.ConstraintLayout;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
@@ -29,7 +30,7 @@ import com.wang.avi.AVLoadingIndicatorView;
  */
 public class ShawnSurfaceViewActivity extends ShawnBaseActivity implements View.OnClickListener, SurfaceHolder.Callback, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
-	private RelativeLayout reTitle;
+	private ConstraintLayout reTitle;
 	private SurfaceView surfaceView = null;
 	private SurfaceHolder surfaceHolder = null;
 	private MediaPlayer mPlayer = null;

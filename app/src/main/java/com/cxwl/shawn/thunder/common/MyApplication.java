@@ -7,6 +7,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.StrictMode;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -22,6 +25,10 @@ public class MyApplication extends Application {
 		instance = this;
 
 		getUserInfo(this);
+
+		//初始化Imageloader
+		ImageLoaderConfiguration configuration = ImageLoaderConfiguration.createDefault(getApplicationContext());
+		ImageLoader.getInstance().init(configuration);
 
 		//解决调用相机闪退问题
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -53,6 +60,7 @@ public class MyApplication extends Application {
     }
 
 	//本地保存用户信息参数
+	public static String TOKEN = "";//token
 	public static String GROUPID = "";//用户组id
 	public static String UID = "";//用户id
 	public static String USERNAME = "";//手机号
@@ -64,6 +72,7 @@ public class MyApplication extends Application {
 
 	public static String USERINFO = "userInfo";//userInfo sharedPreferance名称
 	public static class UserInfo {
+		public static final String token = "token";
 		public static final String groupId = "groupId";
 		public static final String uid = "uid";
 		public static final String userName = "uName";
@@ -82,6 +91,7 @@ public class MyApplication extends Application {
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.clear();
 		editor.apply();
+		TOKEN = "";
 		GROUPID = "";
 		UID = "";
 		USERNAME = "";
@@ -98,6 +108,7 @@ public class MyApplication extends Application {
 	public static void saveUserInfo(Context context) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putString(UserInfo.token, TOKEN);
 		editor.putString(UserInfo.groupId, GROUPID);
 		editor.putString(UserInfo.uid, UID);
 		editor.putString(UserInfo.userName, USERNAME);
@@ -114,6 +125,7 @@ public class MyApplication extends Application {
 	 */
 	public static void getUserInfo(Context context) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(USERINFO, Context.MODE_PRIVATE);
+		TOKEN = sharedPreferences.getString(UserInfo.token, "");
 		GROUPID = sharedPreferences.getString(UserInfo.groupId, "");
 		UID = sharedPreferences.getString(UserInfo.uid, "");
 		USERNAME = sharedPreferences.getString(UserInfo.userName, "");

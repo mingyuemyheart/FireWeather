@@ -21,7 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.cxwl.shawn.thunder.adapter.ShawnPictureLibraryAdapter;
+import com.cxwl.shawn.thunder.adapter.DisasterReportAdapter;
 import com.cxwl.shawn.thunder.dto.StrongStreamDto;
 import com.cxwl.shawn.thunder.util.OkHttpUtil;
 import com.cxwl.shawn.thunder.view.PhotoView;
@@ -48,7 +48,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 public class ShawnPictureLibraryActivity extends ShawnBaseActivity implements View.OnClickListener {
 
     private int page = 1;
-    private ShawnPictureLibraryAdapter picAdapter;
+    private DisasterReportAdapter picAdapter;
     private List<StrongStreamDto> picList = new ArrayList<>();
     private ViewPager mViewPager;
     private RelativeLayout reViewPager;
@@ -78,33 +78,33 @@ public class ShawnPictureLibraryActivity extends ShawnBaseActivity implements Vi
     }
 
     private void initGridView() {
-        GridView gridView = findViewById(R.id.gridView);
-        picAdapter = new ShawnPictureLibraryAdapter(this, picList);
-        gridView.setAdapter(picAdapter);
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                if (reViewPager.getVisibility() == View.GONE) {
-                    if (mViewPager != null) {
-                        mViewPager.setCurrentItem(arg2);
-                    }
-                    scaleExpandAnimation(reViewPager);
-                    reViewPager.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-        gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE && view.getLastVisiblePosition() == view.getCount() - 1) {
-                    page += 1;
-                    OkHttpPictures();
-                }
-            }
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-            }
-        });
+//        GridView gridView = findViewById(R.id.gridView);
+//        picAdapter = new DisasterReportAdapter(this, picList);
+//        gridView.setAdapter(picAdapter);
+//        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+//                if (reViewPager.getVisibility() == View.GONE) {
+//                    if (mViewPager != null) {
+//                        mViewPager.setCurrentItem(arg2);
+//                    }
+//                    scaleExpandAnimation(reViewPager);
+//                    reViewPager.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
+//        gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView view, int scrollState) {
+//                if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE && view.getLastVisiblePosition() == view.getCount() - 1) {
+//                    page += 1;
+//                    OkHttpPictures();
+//                }
+//            }
+//            @Override
+//            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+//            }
+//        });
     }
 
     /**

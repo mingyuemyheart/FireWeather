@@ -7,7 +7,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import com.cxwl.shawn.thunder.util.CommonUtil
 import kotlinx.android.synthetic.main.shawn_activity_textsize.*
-import kotlinx.android.synthetic.main.shawn_layout_title.*
+import kotlinx.android.synthetic.main.layout_title.*
 
 class ShawnTextsizeActivity : ShawnBaseActivity() {
 

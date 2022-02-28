@@ -7,7 +7,7 @@
 
     <include
         android:id="@+id/reTitle"
-        layout="@layout/shawn_layout_title"/>
+        layout="@layout/layout_title"/>
 
     <EditText
         android:id="@+id/etContent"
@@ -82,7 +82,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/divider1"
-        android:background="@drawable/shawn_selector_item"
+        android:background="@drawable/selector_item"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp">
@@ -120,7 +120,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/divider2"
-        android:background="@drawable/shawn_selector_item"
+        android:background="@drawable/selector_item"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp">
@@ -145,7 +145,7 @@
         <ImageView
             android:layout_width="8dp"
             android:layout_height="15dp"
-            android:background="@drawable/shawn_icon_arrow_right"/>
+            android:background="@drawable/icon_arrow_right"/>
     </LinearLayout>
 
     <TextView
@@ -162,7 +162,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/divider3"
-        android:background="@drawable/shawn_selector_item"
+        android:background="@drawable/selector_item"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp">
@@ -199,7 +199,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/divider4"
-        android:background="@drawable/shawn_selector_item"
+        android:background="@drawable/selector_item"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"
         android:paddingRight="15dp">

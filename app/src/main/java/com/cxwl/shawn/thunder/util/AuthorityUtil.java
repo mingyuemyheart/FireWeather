@@ -34,8 +34,8 @@ public class AuthorityUtil {
     //需要申请的所有权限
     public static String[] allPermissions = new String[] {
             Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.READ_PHONE_STATE,
-//            Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
@@ -48,7 +48,7 @@ public class AuthorityUtil {
      */
     public static void intentAuthorSetting(final Context context, String message) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.shawn_dialog_cache, null);
+        View view = inflater.inflate(R.layout.dialog_cache, null);
         TextView tvContent = view.findViewById(R.id.tvContent);
         TextView tvNegtive = view.findViewById(R.id.tvNegtive);
         TextView tvPositive = view.findViewById(R.id.tvPositive);

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">中国雷电</string>
+    <string name="app_name">中国气象防火</string>
 
     <!-- 天气表 -->
     <string name="weather0">晴</string>

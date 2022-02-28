@@ -1,5 +1,6 @@
 package com.cxwl.shawn.thunder.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -7,11 +8,15 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.location.LocationManager;
+import android.media.ThumbnailUtils;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -57,6 +62,16 @@ public class CommonUtil {
     public static float px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return pxValue / scale;
+    }
+
+    public static int widthPixels(Context context) {
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        return dm.widthPixels;
+    }
+
+    public static int heightPixels(Context context) {
+        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+        return dm.heightPixels;
     }
 
     /**
@@ -469,6 +484,74 @@ public class CommonUtil {
     public static float getProgress(Context context) {
         SharedPreferences sp = context.getSharedPreferences("text_size", Context.MODE_PRIVATE);
         return sp.getInt("progress", 14);
+    }
+
+    /**
+     * 获取视频的缩略图
+     * 先通过ThumbnailUtils来创建一个视频的缩略图，然后再利用ThumbnailUtils来生成指定大小的缩略图。
+     * 如果想要的缩略图的宽和高都小于MICRO_KIND，则类型要使用MICRO_KIND作为kind的值，这样会节省内存。
+     * @param videoPath 视频的路径
+     * @param width 指定输出视频缩略图的宽度
+     * @param height 指定输出视频缩略图的高度度
+     * @param kind 参照MediaStore.Images.Thumbnails类中的常量MINI_KIND和MICRO_KIND。
+     *            其中，MINI_KIND: 512 x 384，MICRO_KIND: 96 x 96
+     * @return 指定大小的视频缩略图
+     */
+    public static Bitmap getVideoThumbnail(String videoPath, int width, int height, int kind) {
+        Bitmap bitmap = null;
+        // 获取视频的缩略图
+        bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, kind);
+        bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height, ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
+        return bitmap;
+    }
+
+    /**
+     * 设置摄像头方向
+     * @param cameraId
+     * @param camera
+     * @return
+     */
+    public static int setCameraDisplayOrientation (Activity activity, int cameraId, Camera camera) {
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo (cameraId , info);
+        int rotation = activity.getWindowManager().getDefaultDisplay ().getRotation ();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+        int result;
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;   // compensate the mirror
+        } else {
+            result = ( info.orientation - degrees + 360) % 360;
+        }
+        return result;
+    }
+
+    /**
+     * 格式化时间
+     * @param miss
+     * @return
+     */
+    public static String formatMiss2(int miss) {
+        if (miss == 0) {
+            return "00:00";
+        }
+        String mm = miss / 60 >= 1 ? "0" + miss / 60 : "0" + miss / 60;
+        String ss = miss % 60 > 9 ? miss % 60 + "" : "0" + miss % 60;
+        return mm + ":" + ss;
     }
 
 }
